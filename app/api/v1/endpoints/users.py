@@ -1,7 +1,7 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
 from beanie import PydanticObjectId
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import get_current_active_user, get_current_admin_user
 from app.core.security import get_password_hash
@@ -29,24 +29,6 @@ async def list_users(
     """
     users = await User.find_all().skip(skip).limit(limit).to_list()
     return users
-
-
-@router.post("/", response_model=Any)
-async def create_user(
-    # Add user creation schema
-    current_user: User = Depends(get_current_admin_user),
-) -> Any:
-    """
-    Create a new user (admin only)
-    
-    Args:
-        current_user: Current admin user
-        
-    Returns:
-        Created user
-    """
-    # Implementation
-    pass
 
 
 @router.get("/me", response_model=Any)
