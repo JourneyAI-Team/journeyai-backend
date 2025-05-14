@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "journeyai"
+version = "0.1.0"
+description = ""
+authors = ["Matt <philmattdev@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.12"
+openai = "^1.78.1"
+redis = "^6.1.0"
+celery = "^5.5.2"
+python-dotenv = "^1.1.0"
+pydantic-settings = "^2.9.1"
+beanie = "^1.29.0"
+openai-agents = "^0.0.14"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools]
+packages = ["app"]
