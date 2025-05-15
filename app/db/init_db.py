@@ -1,4 +1,5 @@
 from beanie import init_beanie
+from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.core.config import settings
@@ -6,9 +7,6 @@ from app.models.account import Account
 from app.models.message import Message
 from app.models.organization import Organization
 from app.models.session import Session
-from app.utils.logging import get_logger
-
-logger = get_logger(__name__)
 
 
 async def init_db():
