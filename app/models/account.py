@@ -10,7 +10,9 @@ class Account(Document):
 
     name: str
     description: str | None = None
-    created_at: dt.datetime = Field(default_factory=dt.datetime.now(dt.timezone.utc))
+    created_at: dt.datetime = Field(
+        default_factory=lambda: dt.datetime.now(dt.timezone.utc)
+    )
 
     # Relations
     organization_id: str

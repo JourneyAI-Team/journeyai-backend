@@ -11,7 +11,9 @@ class Organization(Document):
     name: str
     domain: str
 
-    created_at: dt.datetime = Field(default_factory=dt.datetime.now(dt.timezone.utc))
+    created_at: dt.datetime = Field(
+        default_factory=lambda: dt.datetime.now(dt.timezone.utc)
+    )
 
     # Relations
     owner_id: str | None = None

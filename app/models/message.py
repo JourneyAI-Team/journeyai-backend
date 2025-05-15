@@ -14,7 +14,9 @@ class Message(Document):
     output: ResponseOutputItem
     sender: SenderType
 
-    created_at: dt.datetime = Field(default_factory=dt.datetime.now(dt.timezone.utc))
+    created_at: dt.datetime = Field(
+        default_factory=lambda: dt.datetime.now(dt.timezone.utc)
+    )
 
     # Relations
     user_id: str
