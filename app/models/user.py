@@ -14,7 +14,9 @@ class User(Document):
     hashed_password: str
     role: RoleType = Field(default=RoleType.MEMBER)
 
-    created_at: dt.datetime = Field(default_factory=dt.datetime.now(dt.timezone.utc))
+    created_at: dt.datetime = Field(
+        default_factory=lambda: dt.datetime.now(dt.timezone.utc)
+    )
 
     # Relations
     organization_id: str
