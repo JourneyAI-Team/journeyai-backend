@@ -34,8 +34,8 @@ async def login(
     -------
     dict
         Dictionary with two keys:
-        ``access_token`` – the generated JWT.
-        ``token_type`` – always ``"bearer"``.
+        ``access_token`` - the generated JWT.
+        ``token_type`` - always ``"bearer"``.
 
     Raises
     ------
