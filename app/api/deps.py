@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.token import TokenPayload
+from app.schemas.types import RoleType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
@@ -102,7 +103,7 @@ async def get_current_admin_user(
         If the user lacks administrative permissions.
     """
 
-    if not current_user.is_admin:
+    if not current_user.role == RoleType.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions",
