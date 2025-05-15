@@ -14,18 +14,33 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+) -> Any:
     """
-    OAuth2 compatible token login, get an access token for future requests
+    Obtain a bearer access token.
 
-    Args:
-        form_data: OAuth2 password request form
+    This endpoint is OAuth 2 compatible.
+    The user's credentials are validated and, if correct, a JWT token
+    is issued.
 
-    Returns:
-        Access token information
+    Parameters
+    ----------
+    form_data : OAuth2PasswordRequestForm, optional
+        Form that contains the user's e-mail (as *username*) and
+        password. Injected automatically by FastAPI.
 
-    Raises:
-        HTTPException: If authentication fails
+    Returns
+    -------
+    dict
+        Dictionary with two keys:
+        ``access_token`` – the generated JWT.
+        ``token_type`` – always ``"bearer"``.
+
+    Raises
+    ------
+    HTTPException
+        401 if the credentials are invalid.
     """
     user = await User.find_one(User.email == form_data.username)
     if not user:
@@ -52,30 +67,44 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
 
 @router.post("/register", response_model=Token)
 async def register(
-    # Add user creation schema here
+    # User creation schema should be added here, e.g. `user_in: UserCreate`
 ) -> Any:
     """
-    Register a new user
+    Register a new user.
 
-    Args:
-        User creation data
+    Parameters
+    ----------
+    user_in : UserCreate
+        Pydantic model with the data required to create a new user.
+        (Placeholder - replace with the actual schema once available.)
 
-    Returns:
-        Access token information
+    Returns
+    -------
+    dict
+        Same structure as the login endpoint:
+        ``access_token`` and ``token_type`` on successful registration.
+
+    Notes
+    -----
+    This endpoint has not yet been implemented.
     """
     # Implementation here
-    pass
 
 
 @router.get("/me", response_model=Any)
 async def get_me(current_user: User = Depends(get_current_user)) -> Any:
     """
-    Get current user information
+    Retrieve the currently authenticated user.
 
-    Args:
-        current_user: Current authenticated user
+    Parameters
+    ----------
+    current_user : User, optional
+        The user resolved from the provided JWT. Supplied via the
+        ``get_current_user`` dependency.
 
-    Returns:
-        Current user information
+    Returns
+    -------
+    User
+        The authenticated user object.
     """
     return current_user
