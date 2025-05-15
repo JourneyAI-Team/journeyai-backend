@@ -6,9 +6,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import get_current_user
 from app.core.config import settings
-from app.core.security import create_access_token, verify_password
+from app.core.security import create_access_token, get_password_hash, verify_password
 from app.models.user import User
 from app.schemas.token import Token
+from app.schemas.user import UserCreate, UserRead
 
 router = APIRouter()
 
@@ -66,9 +67,7 @@ async def login(
 
 
 @router.post("/register", response_model=Token)
-async def register(
-    # User creation schema should be added here, e.g. `user_in: UserCreate`
-) -> Any:
+async def register(user_in: UserCreate) -> Any:
     """
     Register a new user.
 
@@ -76,7 +75,6 @@ async def register(
     ----------
     user_in : UserCreate
         Pydantic model with the data required to create a new user.
-        (Placeholder - replace with the actual schema once available.)
 
     Returns
     -------
@@ -84,14 +82,43 @@ async def register(
         Same structure as the login endpoint:
         ``access_token`` and ``token_type`` on successful registration.
 
-    Notes
-    -----
-    This endpoint has not yet been implemented.
+    Raises
+    ------
+    HTTPException
+        400 if a user with the same email already exists.
     """
-    # Implementation here
+
+    # Check if user already exists
+    existing_user = await User.find_one(User.email == user_in.email)
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered",
+        )
+
+    # Create new user
+    new_user = User(
+        email=user_in.email,
+        hashed_password=get_password_hash(user_in.password),
+        organization_id=user_in.organization_id,
+    )
+
+    # Save user to database
+    await new_user.insert()
+
+    # Generate access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        subject=str(new_user.id), expires_delta=access_token_expires
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
 
 
-@router.get("/me", response_model=Any)
+@router.get("/me", response_model=UserRead)
 async def get_me(current_user: User = Depends(get_current_user)) -> Any:
     """
     Retrieve the currently authenticated user.
@@ -104,7 +131,7 @@ async def get_me(current_user: User = Depends(get_current_user)) -> Any:
 
     Returns
     -------
-    User
-        The authenticated user object.
+    UserRead
+        The authenticated user object with sensitive information removed.
     """
     return current_user
