@@ -7,6 +7,7 @@ from app.models.account import Account
 from app.models.message import Message
 from app.models.organization import Organization
 from app.models.session import Session
+from app.models.user import User
 
 
 async def init_db():
@@ -30,6 +31,7 @@ async def init_db():
             Organization,
             Session,
             Message,
+            User,
         ],
     )
 
