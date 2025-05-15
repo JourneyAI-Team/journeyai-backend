@@ -1,6 +1,8 @@
+import uuid
+
 from beanie import Document
 from pydantic import Field
-import uuid
+
 
 class Session(Document):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
