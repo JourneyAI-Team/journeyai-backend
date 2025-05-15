@@ -1,6 +1,6 @@
-# Project Title
+# Journey
 
-A short description of what your project does.
+Welcome to the Journey AI Repository!
 
 ---
 
