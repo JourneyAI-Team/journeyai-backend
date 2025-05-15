@@ -19,4 +19,4 @@ class User(Document):
     )
 
     # Relations
-    organization_id: str
+    organization_id: str | None = None
