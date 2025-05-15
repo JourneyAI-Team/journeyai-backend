@@ -1,9 +1,8 @@
-import logging
 from typing import Any, Dict, Optional
 
-from app.tasks.worker import celery_app
+from loguru import logger
 
-logger = logging.getLogger(__name__)
+from app.tasks.worker import celery_app
 
 
 @celery_app.task(name="send_email_notification")
