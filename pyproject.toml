@@ -19,6 +19,7 @@ loguru = "^0.7.3"
 python-jose = "^3.4.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pydantic-extra-types = "^2.10.4"
+pydantic = {extras = ["email"], version = "^2.11.4"}
 
 [build-system]
 requires = ["poetry-core"]
