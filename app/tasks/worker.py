@@ -1,4 +1,6 @@
 import os
+
+
 from celery import Celery
 
 from app.core.config import settings
@@ -29,4 +31,4 @@ celery_app.conf.update(
 
 
 if __name__ == "__main__":
-    celery_app.start() 
+    celery_app.start()
