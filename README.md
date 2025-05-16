@@ -33,5 +33,3 @@ The application expects a `.env` file in the project root.
 ```bash
 poetry run python -m app.main
 ```
-
-test push
