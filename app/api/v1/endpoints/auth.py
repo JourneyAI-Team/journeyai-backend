@@ -7,10 +7,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.api.deps import get_current_user
 from app.core.config import settings
 from app.core.security import create_access_token, get_password_hash, verify_password
-
-from app.models.user import User
 from app.models.organization import Organization
-
+from app.models.user import User
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserRead
 
@@ -98,13 +96,12 @@ async def register(user_in: UserCreate) -> Any:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered",
         )
-    
+
     # Create new user
     new_user = User(
-        email=user_in.email,
-        hashed_password=get_password_hash(user_in.password)
+        email=user_in.email, hashed_password=get_password_hash(user_in.password)
     )
-    
+
     org_domain = user_in.email.split("@")[1]
     org_name = org_domain.split(".")[0]
 
@@ -113,9 +110,7 @@ async def register(user_in: UserCreate) -> Any:
     # If organization does not exist, create a new organization with the owner id as the new user's id
     if not organization:
         organization = Organization(
-            name = org_name,
-            domain = org_domain,
-            owner_id = new_user.id
+            name=org_name, domain=org_domain, owner_id=new_user.id
         )
 
         await organization.insert()
