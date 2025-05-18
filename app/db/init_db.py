@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.core.config import settings
 from app.models.account import Account
-from app.models.crm import Opportunity
+from app.models.crm import Contact, Opportunity
 from app.models.message import Message
 from app.models.organization import Organization
 from app.models.session import Session
@@ -34,6 +34,7 @@ async def init_db():
             Message,
             User,
             Opportunity,
+            Contact,
         ],
     )
 
