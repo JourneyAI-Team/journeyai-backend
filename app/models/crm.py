@@ -20,3 +20,17 @@ class Opportunity(Document):
     organization_id: str
     account_id: str
     user_id: str
+
+
+class Contact(Document):
+    id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+
+    email: str
+    first_name: str
+    last_name: str | None = None
+    title: str | None = None
+
+    # Relations
+    organization_id: str
+    account_id: str
+    user_id: str
