@@ -19,4 +19,3 @@ class Opportunity(Document):
     # Relations
     organization_id: str
     account_id: str
-    contact_id: str
