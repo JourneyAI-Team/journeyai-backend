@@ -99,16 +99,16 @@ async def register(user_in: UserCreate) -> Any:
             detail="Email already registered",
         )
     
-    org_domain = user_in.email.split("@")[1]
-    org_name = org_domain.split(".")[0]
-
-    organization = await Organization.find_one(Organization.name == org_name)
-
     # Create new user
     new_user = User(
         email=user_in.email,
         hashed_password=get_password_hash(user_in.password)
     )
+    
+    org_domain = user_in.email.split("@")[1]
+    org_name = org_domain.split(".")[0]
+
+    organization = await Organization.find_one(Organization.name == org_name)
 
     # If organization does not exist, create a new organization with the owner id as the new user's id
     if not organization:
