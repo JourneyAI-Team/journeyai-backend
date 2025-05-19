@@ -12,6 +12,8 @@ from typing import Any, Callable, List, Optional
 from fastapi import WebSocket
 from loguru import logger
 
+from app.models.user import User
+
 # Registry to store all event handlers
 event_handlers: dict[str, Callable] = {}
 
@@ -44,7 +46,7 @@ active_connections: dict[str, WebSocket] = {}
 
 
 async def handle_event(
-    connection_id: str, event_name: str, data: dict[str, Any]
+    connection_id: str, current_user: User, event_name: str, data: dict[str, Any]
 ) -> None:
     """
     Handle an incoming WebSocket event.
@@ -53,6 +55,8 @@ async def handle_event(
     ----------
     connection_id : str
         The ID of the WebSocket connection.
+    current_user: User
+        The authenticated user's information.
     event_name : str
         The name of the event to handle.
     data : dict[str, Any]
@@ -63,7 +67,7 @@ async def handle_event(
     handler = event_handlers.get(event_name)
     if handler:
         try:
-            await handler(connection_id, data)
+            await handler(connection_id, current_user, data)
         except Exception as e:
             logger.exception(f"Error handling event {event_name}: {str(e)}")
             await send_error(connection_id, f"Error processing event: {str(e)}")
