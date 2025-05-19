@@ -12,10 +12,12 @@ from app.utils.loki_logger import setup_logger
 @asynccontextmanager
 async def lifespan(_: FastAPI):
 
-    setup_logger(
-        settings.LOKI_URL,
-        labels={"job": "journey", "environment": settings.ENVIRONMENT},
-    )
+    if settings.LOKI_URL:
+
+        setup_logger(
+            settings.LOKI_URL,
+            labels={"job": "journey", "environment": settings.ENVIRONMENT},
+        )
 
     await init_db()
     yield
