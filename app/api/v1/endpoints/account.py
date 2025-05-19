@@ -122,11 +122,8 @@ async def get_account(
 
     Returns
     -----
-    dict
-        ``id`` - account id.
-        ``name`` - account name.
-        ``description`` - account description.
-        ``organization_id`` - ID of the organization the account belongs to
+    AccountRead
+        The account object.
 
     Raises
     -----
