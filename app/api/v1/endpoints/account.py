@@ -34,29 +34,47 @@ async def create_account(
         400 if the account is already registered in the organization
     """
 
-    # Find if account exists in the current_user's organization
-    existing_account = await Account.find_one(
-        Account.organization_id == current_user.organization_id,
-        Account.name == account.name,
-    )
-    if existing_account:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Account already registered in the organization.",
+    with logger.contextualize(
+        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+    ):
+        logger.info(f"Create account request received. {account.name=}")
+
+        # Find if account exists in the current_user's organization
+        existing_account = await Account.find_one(
+            Account.organization_id == current_user.organization_id,
+            Account.name == account.name,
+        )
+        if existing_account:
+            logger.warning(
+                f"Account already registered in the organization. {account.name=}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Account already registered in the organization.",
+            )
+
+        # Create the new account
+        new_account = Account(
+            name=account.name,
+            description=account.description,
+            organization_id=current_user.organization_id,
+            user_id=current_user.id,
         )
 
-    # Create the new account
-    new_account = Account(
-        name=account.name,
-        description=account.description,
-        organization_id=current_user.organization_id,
-        user_id=current_user.id,
-    )
+        try:
+            # Save the new account to the database
+            await new_account.insert()
+        except Exception as e:
+            logger.exception(
+                f"Database insert failed when creating account. {account.name=}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error creating account.",
+            ) from e
 
-    # Save the new account to the database
-    await new_account.insert()
-
-    return {}
+        return new_account
 
 
 @router.get("/", response_model=List[AccountRead])
