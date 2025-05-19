@@ -15,6 +15,7 @@ class Settings(BaseSettings):
         60 * 24 * 8
     )  # 60 minutes * 24 hours * 8 days = 8 days
     PROJECT_NAME: str = "JourneyAI"
+    ENVIRONMENT: str = "local"  # local, development, production
 
     # CORS
     BACKEND_CORS_ORIGINS: list[str] = []
@@ -28,6 +29,9 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     REDIS_PASSWORD: Optional[str] = None
+
+    # Loki
+    LOKI_URL: str = "https://logs-prod-036.grafana.net/api/v1/push"
 
     class Config:
         case_sensitive = True
