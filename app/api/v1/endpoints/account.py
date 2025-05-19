@@ -94,10 +94,19 @@ async def list_accounts(
         List of account object dictionaries.
 
     """
-    accounts = await Account.find(
-        Account.organization_id == current_user.organization_id
-    ).to_list()
-    return accounts
+
+    with logger.contextualize(
+        user_id=current_user.id, organization_id=current_user.organization_id
+    ):
+        logger.info("List accounts request received.")
+
+        accounts = await Account.find(
+            Account.organization_id == current_user.organization_id
+        ).to_list()
+
+        logger.info(f"Found {len(accounts)} accounts in the organization.")
+
+        return accounts
 
 
 @router.get("/{account_id}", response_model=AccountRead)
