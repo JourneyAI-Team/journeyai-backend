@@ -12,6 +12,7 @@ class User(Document):
 
     email: str
     hashed_password: str
+    access_token: str | None = None
     role: RoleType = Field(default=RoleType.MEMBER)
 
     created_at: dt.datetime = Field(
