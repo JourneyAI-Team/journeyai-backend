@@ -230,18 +230,27 @@ async def delete_account(
         404 if account could not be found within an organization
     """
 
-    # Check if account exists in the organization the current user is in
-    account = await Account.find_one(
-        Account.organization_id == current_user.organization_id,
-        Account.id == account_id,
-    )
-    if not account:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Account could not be found within the organization.",
-        )
+    with logger.contextualize(
+        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+        account_id=account_id,
+    ):
+        logger.info("Delete account request received.")
 
-    # Delete the account
-    await account.delete()
+        # Check if account exists in the organization the current user is in
+        account = await Account.find_one(
+            Account.organization_id == current_user.organization_id,
+            Account.id == account_id,
+        )
+        if not account:
+            logger.warning("Account could not be found within the organization.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account could not be found within the organization.",
+            )
+
+        # Delete the account
+        await account.delete()
+        logger.success("Account deleted successfully.")
 
     return {}
