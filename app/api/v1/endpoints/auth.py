@@ -1,3 +1,5 @@
+import uuid
+
 from datetime import timedelta
 from typing import Any
 
@@ -59,10 +61,16 @@ async def login(
         )
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    # Generate api key for websockets auth and update the user's access token field using the new api key
+    api_key = uuid.uuid4().hex
+    await user.set({User.access_token: api_key})
+
     return {
         "access_token": create_access_token(
             subject=str(user.id), expires_delta=access_token_expires
         ),
+        "api_key": api_key,
         "token_type": "bearer",
     }
 
@@ -118,6 +126,10 @@ async def register(user_in: UserCreate) -> Any:
     # Assign the new user to its organization
     new_user.organization_id = organization.id
 
+    # Generate api key for websockets auth and save to user database
+    api_key = uuid.uuid4().hex
+    new_user.access_token = api_key
+
     # Save user to database
     await new_user.insert()
 
@@ -129,6 +141,7 @@ async def register(user_in: UserCreate) -> Any:
 
     return {
         "access_token": access_token,
+        "api_key": api_key,
         "token_type": "bearer",
     }
 
