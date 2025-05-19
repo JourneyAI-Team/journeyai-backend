@@ -9,6 +9,7 @@ class Token(BaseModel):
     """
 
     access_token: str
+    api_key: str
     token_type: str
 
 
