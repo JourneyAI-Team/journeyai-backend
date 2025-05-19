@@ -35,6 +35,7 @@ async def create_session(
     HTTPException
         404 if account or assistant could not be found.
     """
+
     with logger.contextualize(
         user_id=current_user.id, organization_id=current_user.organization_id
     ):
