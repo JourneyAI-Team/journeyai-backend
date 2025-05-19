@@ -11,7 +11,7 @@ import uuid
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from loguru import logger
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user_api_key
 from app.models.user import User
 from app.utils.websocket.handlers import (
     active_connections,
@@ -26,7 +26,7 @@ router = APIRouter()
 @router.websocket("/main")
 async def authenticated_websocket_endpoint(
     websocket: WebSocket,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_api_key),
 ):
     """
     Authenticated WebSocket endpoint.
@@ -73,7 +73,7 @@ async def authenticated_websocket_endpoint(
                     continue
 
                 # Handle the event
-                await handle_event(connection_id, event_name, event_data)
+                await handle_event(connection_id, current_user, event_name, event_data)
 
             except json.JSONDecodeError:
                 logger.warning(f"Received invalid JSON from client: {data}")
