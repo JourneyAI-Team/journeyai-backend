@@ -105,6 +105,7 @@ async def get_account(
     HTTPException
         404 if account could not be found within an organization
     """
+
     account = await Account.find_one(
         Account.organization_id == current_user.organization_id,
         Account.id == account_id,
@@ -144,6 +145,7 @@ async def update_account(
     HTTPException
         404 if account could not be found within an organization
     """
+
     # Check if account exists in the organization the current user is in
     account = await Account.find_one(
         Account.organization_id == current_user.organization_id,
@@ -184,6 +186,7 @@ async def delete_account(
     HTTPException
         404 if account could not be found within an organization
     """
+
     # Check if account exists in the organization the current user is in
     account = await Account.find_one(
         Account.organization_id == current_user.organization_id,

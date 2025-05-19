@@ -22,12 +22,12 @@ async def create_session(
     Parameters
     -----
         session : SessionCreate
-                Request body. Fields required to create a new session.
+            Request body. Fields required to create a new session.
 
     Returns
     -----
         SessionRead
-                Returns the newly created session information.
+            Returns the newly created session information.
 
     Raises
     -----
@@ -80,7 +80,7 @@ async def get_session(
     Parameters
     -----
     session_id : str
-                Path parameter. The session id to retrieve.
+        Path parameter. The session id to retrieve.
 
     Returns
     -----
@@ -92,6 +92,7 @@ async def get_session(
     HTTPException
         404 if session could not be found.
     """
+
     # Check if session exists
     session = await Session.find_one(
         Session.id == session_id,
@@ -116,20 +117,21 @@ async def update_session(
     Parameters
     -----
     session_id: str
-                Path parameter. The session's id to update.
+        Path parameter. The session's id to update.
     session_in: SessionUpdate
-                Request Body. Fields that can be updated.
+        Request Body. Fields that can be updated.
 
     Returns
     -----
     dict
-                Empty Dictionary
+        Empty Dictionary
 
     Raises
     -----
     HTTPException
         404 if session could not be found.
     """
+
     # Check if session exists.
     session = await Session.find_one(
         Session.id == session_id,
@@ -159,18 +161,19 @@ async def delete_session(
     Parameters
     -----
     session_id: str
-                Path parameter. The session's id to delete.
+        Path parameter. The session's id to delete.
 
     Returns
     -----
     dict
-                Empty dictionary.
+        Empty dictionary.
 
     Raises
     -----
     HTTPException
         404 if session could not be found.
     """
+
     # Check if session exists.
     session = await Session.find_one(
         Session.id == session_id,
