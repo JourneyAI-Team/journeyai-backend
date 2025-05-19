@@ -65,6 +65,7 @@ async def create_account(
         try:
             # Save the new account to the database
             await new_account.insert()
+            logger.success(f"Account created successfully. {account.name=}")
         except Exception as e:
             logger.exception(
                 f"Database insert failed when creating account. {account.name=}"
