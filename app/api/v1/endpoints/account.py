@@ -31,7 +31,7 @@ async def create_account(
     Raises
     -----
     HTTPException
-        404 if account could not be found within an organization
+        400 if the account is already registered in the organization
     """
 
     # Find if account exists in the current_user's organization
