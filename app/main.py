@@ -6,10 +6,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.db.init_db import init_db
+from app.utils.loki_logger import setup_logger
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+
+    setup_logger(
+        settings.LOKI_URL,
+        labels={"job": "journey", "environment": settings.ENVIRONMENT},
+    )
+
     await init_db()
     yield
 
