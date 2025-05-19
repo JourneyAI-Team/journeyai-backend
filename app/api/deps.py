@@ -11,6 +11,30 @@ from app.schemas.types import RoleType
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
 
+async def get_current_user_api_key(api_key: str) -> User:
+    """
+    Retrieve the current user via the api key query parameter.
+
+    Parameters
+    -----
+    api_key : str
+        The api key generated upon login or registration which is then
+        passed as a query parameter upon request.
+
+    Raises
+    -----
+    HTTPException
+        404 if the user does not exist.
+    """
+    user = await User.find_one(User.access_token == api_key)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user
+
+
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     """
     Retrieve the current user from a JWT token.
