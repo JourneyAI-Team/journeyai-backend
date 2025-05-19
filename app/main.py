@@ -10,6 +10,8 @@ from app.utils.loki_logger import setup_logger
 from app.utils.redis_client import close_redis_connections
 from app.utils.websocket.redis_listener import start_redis_listener, stop_redis_listener
 
+import app.api.v1.websockets.handlers
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
