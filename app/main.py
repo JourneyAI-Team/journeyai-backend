@@ -7,6 +7,8 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.db.init_db import init_db
 from app.utils.loki_logger import setup_logger
+from app.utils.redis_client import close_redis_connections
+from app.utils.websocket.redis_listener import start_redis_listener, stop_redis_listener
 
 
 @asynccontextmanager
@@ -20,7 +22,17 @@ async def lifespan(_: FastAPI):
         )
 
     await init_db()
+
+    # Start Redis listener for WebSocket messages
+    await start_redis_listener()
+
     yield
+
+    # Stop Redis listener when shutting down
+    await stop_redis_listener()
+
+    # Close Redis connections
+    await close_redis_connections()
 
 
 app = FastAPI(
