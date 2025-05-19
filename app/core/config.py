@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: Optional[str] = None
 
     # Loki
-    LOKI_URL: str = "https://logs-prod-036.grafana.net/api/v1/push"
+    LOKI_URL: str | None = None
 
     class Config:
         case_sensitive = True
