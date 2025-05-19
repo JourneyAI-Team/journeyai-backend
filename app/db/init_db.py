@@ -3,6 +3,7 @@ from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.core.config import settings
+from app.models.artifact import Artifact
 from app.models.account import Account
 from app.models.crm import Contact, Opportunity
 from app.models.message import Message
@@ -29,6 +30,7 @@ async def init_db():
         database=client[settings.MONGODB_DB_NAME],
         document_models=[
             Account,
+            Artifact,
             Organization,
             Session,
             Message,
