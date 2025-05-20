@@ -3,14 +3,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import app.api.v1.websockets.handlers
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.db.init_db import init_db
 from app.utils.loki_logger import setup_logger
 from app.utils.redis_client import close_redis_connections
 from app.utils.websocket.redis_listener import start_redis_listener, stop_redis_listener
-
-import app.api.v1.websockets.handlers
 
 
 @asynccontextmanager
