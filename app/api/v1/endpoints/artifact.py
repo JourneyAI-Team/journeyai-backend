@@ -47,7 +47,7 @@ async def create_artifact(
             Session.organization_id == current_user.organization_id,
         )
         if not session:
-            logger.warning(f"Session does not exist.")
+            logger.warning("Session does not exist.")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Session does not exist."
             )
