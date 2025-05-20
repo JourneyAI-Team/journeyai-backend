@@ -9,3 +9,8 @@ class SenderType(str, Enum):
 class RoleType(str, Enum):
     ADMIN = "admin"
     MEMBER = "member"
+
+
+class OriginType(str, Enum):
+    LLM = "llm"
+    USER = "User"
