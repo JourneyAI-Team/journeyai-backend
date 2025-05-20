@@ -14,3 +14,8 @@ class RoleType(str, Enum):
 class OriginType(str, Enum):
     LLM = "llm"
     USER = "User"
+
+
+class ToolType(str, Enum):
+    INTERNAL = "internal"
+    EXTERNAL = "external"
