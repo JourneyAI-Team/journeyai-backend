@@ -12,9 +12,9 @@ class Assistant(Document):
     internal_name: str
     description: str
 
-    tool_config: dict[str, str]
-    testing: bool
-    version: str
+    tool_config: dict[str, str] = Field(default_factory=dict)
+    testing: bool = False
+    version: str = "0.0.1"
 
     # Agent Parameters
     developer_prompt: str
