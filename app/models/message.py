@@ -1,3 +1,5 @@
+from typing import Optional
+
 import datetime as dt
 import uuid
 
@@ -6,12 +8,14 @@ from openai.types.responses import ResponseOutputItem
 from pydantic import Field
 
 from app.schemas.types import SenderType
+from app.schemas.message import InputMessageSchema
 
 
 class Message(Document):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
 
-    output: ResponseOutputItem
+    output: Optional[ResponseOutputItem]
+    input: Optional[InputMessageSchema]
     sender: SenderType
 
     created_at: dt.datetime = Field(
