@@ -16,13 +16,13 @@ class SessionCreate(SessionBase):
     Parameters
     -----
     title : str, optional
-            Session title
+        Session title
     summary : str, optional
-            Session summary
+        Session summary
     assistant_id : str
-            The id of the Assistant for this session
+        The id of the Assistant for this session
     account_id : str
-            Account this session is tied to.
+        Account this session is tied to.
     """
 
     title: str | None
@@ -38,17 +38,17 @@ class SessionRead(SessionBase):
     Parameters
     -----
     title : str
-            Session title
+        Session title
     summary : str, optional
-            Session summary
+        Session summary
     assistant_id : str
             The id of the Assistant for this session
     account_id : str
-            Account this session is tied to.
+        Account this session is tied to.
     user_id : str
-            The id of the user who created this session.
+        The id of the user who created this session.
     organization_id : str
-            The id of the organization in which this session belongs to.
+        The id of the organization in which this session belongs to.
     """
 
     id: str
@@ -67,9 +67,9 @@ class SessionUpdate(SessionBase):
     Parameters
     -----
     title : str
-            Session title
+        Session title
     summary : str, optional
-            Session summary
+        Session summary
 
     """
 
