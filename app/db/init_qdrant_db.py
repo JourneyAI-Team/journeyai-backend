@@ -11,5 +11,7 @@ async def init_qdrant_db():
     if not await client.collection_exists("Artifacts"):
         await client.create_collection(
             collection_name="Artifacts",
-            vectors_config=models.VectorParams(size=4, distance=models.Distance.COSINE),
+            vectors_config=models.VectorParams(
+                size=1536, distance=models.Distance.COSINE
+            ),
         )
