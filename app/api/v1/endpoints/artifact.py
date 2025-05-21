@@ -4,6 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 
 from app.api.deps import get_current_user
+from app.external.ai_service import get_embeddings
+
+from app.utils.qdrant_client import insert_vector
+
 from app.models.account import Account
 from app.models.artifact import Artifact
 from app.models.session import Session
@@ -65,7 +69,7 @@ async def create_artifact(
         )
 
         try:
-            await new_artifact.insert()
+            # await new_artifact.insert()
             logger.success(f"Artifact created successfully. {artifact.title=}")
         except Exception as e:
             logger.exception(
@@ -75,6 +79,25 @@ async def create_artifact(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error creating artifact.",
             ) from e
+
+        embedding_input = f"""
+        Title: {new_artifact.title}
+        Body: {new_artifact.body}
+        """
+        artifact_embeddings = await get_embeddings(embedding_input, source="user")
+
+        # Save embeddings to Qdrant
+        await insert_vector(
+            "Artifacts",
+            id=new_artifact.id,
+            payload={
+                "session_id": new_artifact.session_id,
+                "user_id": new_artifact.user_id,
+                "organization_id": new_artifact.organization_id,
+                "account_id": new_artifact.account_id,
+            },
+            vector=artifact_embeddings,
+        )
     return new_artifact
 
 
