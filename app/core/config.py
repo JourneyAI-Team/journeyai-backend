@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     MONGODB_URL: str | None = None
     MONGODB_DB_NAME: str = "journeyai"
 
+    # Qdrant
+    QDRANT_URL: str | None = None
+
     # Redis
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
@@ -32,6 +35,9 @@ class Settings(BaseSettings):
 
     # Loki
     LOKI_URL: str | None = None
+
+    # OpenAI
+    OPENAI_API_KEY: str | None = None
 
     class Config:
         case_sensitive = True
