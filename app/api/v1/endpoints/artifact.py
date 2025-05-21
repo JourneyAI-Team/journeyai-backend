@@ -69,7 +69,7 @@ async def create_artifact(
         )
 
         try:
-            # await new_artifact.insert()
+            await new_artifact.insert()
             logger.success(f"Artifact created successfully. {artifact.title=}")
         except Exception as e:
             logger.exception(
@@ -80,15 +80,17 @@ async def create_artifact(
                 detail="Error creating artifact.",
             ) from e
 
+        # Generate embeddings from artifact
         embedding_input = f"""
         Title: {new_artifact.title}
         Body: {new_artifact.body}
         """
+
         artifact_embeddings = await get_embeddings(embedding_input, source="user")
 
         # Save embeddings to Qdrant
         await insert_vector(
-            "Artifacts",
+            collection_name="Artifacts",
             id=new_artifact.id,
             payload={
                 "session_id": new_artifact.session_id,
