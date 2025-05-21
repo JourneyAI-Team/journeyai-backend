@@ -19,3 +19,7 @@ class OriginType(str, Enum):
 class ToolType(str, Enum):
     INTERNAL = "internal"
     EXTERNAL = "external"
+
+
+class EmbeddingInputSourceType(str, Enum):
+    USER = "user"
