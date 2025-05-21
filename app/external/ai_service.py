@@ -17,7 +17,7 @@ async def get_embeddings(
     embedding_input : str
         The string text to embed.
 
-    sourse : str
+    source : str
         Text source.
 
     Returns
