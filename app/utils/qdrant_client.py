@@ -23,7 +23,7 @@ async def insert_vector(
         points_struct = qdrant_client.models.PointStruct(
             id=id, payload=payload, vector=vector
         )
-        await client.upsert(collection_name=collection_name, points=points_struct)
+        await client.upsert(collection_name=collection_name, points=[points_struct])
     except Exception as e:
         logger.exception(f"Error inserting vector: {str(e)}")
         raise
