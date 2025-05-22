@@ -1,8 +1,9 @@
 from typing import List
 
-from app.utils.openai_client import get_openai_async_client
-from app.schemas.types import EmbeddingInputSourceType
 from loguru import logger
+
+from app.schemas.types import EmbeddingInputSourceType
+from app.utils.openai_client import get_openai_async_client
 
 
 async def get_embeddings(
