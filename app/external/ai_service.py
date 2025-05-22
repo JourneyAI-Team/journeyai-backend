@@ -29,7 +29,7 @@ async def get_embeddings(
     client = get_openai_async_client()
     if source == "user":
         embedding_input = (
-            f"""
+            """
         Uploaded By User
         """
             + embedding_input
