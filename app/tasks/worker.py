@@ -7,11 +7,12 @@ from app.core.config import settings
 # Create Celery instance
 celery_app = Celery(
     "journeyai_worker",
-    broker=f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}",
-    backend=f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}",
+    broker=f"redis://default:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}",
+    backend=f"redis://default:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}",
     include=[
         "app.tasks.conversation_tasks",
         "app.tasks.notification_tasks",
+        "app.tasks.artifact_tasks",
         # Add more task modules here
     ],
 )
