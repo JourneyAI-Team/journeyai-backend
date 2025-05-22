@@ -7,8 +7,8 @@ from app.api.deps import get_current_user
 from app.external.ai_service import get_embeddings
 
 from app.utils.qdrant_client import insert_vector
+from app.utils.constructor_utils import construct_embedding_input_for_artifact
 
-from app.models.account import Account
 from app.models.artifact import Artifact
 from app.models.session import Session
 from app.models.user import User
@@ -81,10 +81,9 @@ async def create_artifact(
             ) from e
 
         # Generate embeddings from artifact
-        embedding_input = f"""
-        Title: {new_artifact.title}
-        Body: {new_artifact.body}
-        """
+        embedding_input = construct_embedding_input_for_artifact(
+            title=new_artifact.title, body=new_artifact.body, source="user"
+        )
 
         artifact_embeddings = await get_embeddings(embedding_input, source="user")
 
