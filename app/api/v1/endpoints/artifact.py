@@ -1,20 +1,17 @@
 import asyncio
 import time
-
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 
 from app.api.deps import get_current_user
-
 from app.models.artifact import Artifact
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.artifact import ArtifactCreate, ArtifactRead, ArtifactUpdate
-
 from app.tasks.artifact_tasks import post_artifact_creation
-from app.tasks.redis_queue import task_queue
+from app.tasks.queues import task_queue
 
 router = APIRouter()
 
