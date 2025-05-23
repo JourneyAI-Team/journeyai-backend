@@ -15,4 +15,5 @@ redis_url = Redis(
     password=settings.REDIS_PASSWORD,
     db=settings.REDIS_DB,
 )
-task_queue = Queue("task_queue", connection=redis_url)
+
+artifacts_queue = Queue("artifacts_queue", connection=redis_url)

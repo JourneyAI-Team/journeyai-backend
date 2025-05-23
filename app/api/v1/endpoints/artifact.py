@@ -11,7 +11,7 @@ from app.models.session import Session
 from app.models.user import User
 from app.schemas.artifact import ArtifactCreate, ArtifactRead, ArtifactUpdate
 from app.tasks.artifact_tasks import post_artifact_creation
-from app.tasks.queues import task_queue
+from app.tasks.queues import artifacts_queue
 
 router = APIRouter()
 
@@ -71,7 +71,7 @@ async def create_artifact(
             # await new_artifact.insert()
             # artifact_json = new_artifact.model_dump_json()
             # await post_artifact_creation.apply_async()
-            job = task_queue.enqueue(post_artifact_creation)
+            job = artifacts_queue.enqueue(post_artifact_creation)
             print(job.return_value())
             time.sleep(2)
             print(job.return_value())
