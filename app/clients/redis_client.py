@@ -16,6 +16,80 @@ _redis_client = None
 _redis_async_client = None
 
 
+class RedisClient:
+    """
+    Singleton class for managing a synchronous Redis client.
+    """
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            try:
+                cls._instance = redis.Redis(
+                    host=settings.REDIS_HOST,
+                    port=settings.REDIS_PORT,
+                    db=settings.REDIS_DB,
+                    decode_responses=True,
+                    password=settings.REDIS_PASSWORD,
+                )
+                logger.success("Synchronous Redis client initialized")
+            except Exception as e:
+                logger.exception(f"Error initializing Redis client: {str(e)}")
+                raise
+        return cls._instance
+
+    @staticmethod
+    def close():
+        """
+        Close the Redis connection.
+        """
+        if RedisClient._instance is not None:
+            try:
+                RedisClient._instance.close()
+                RedisClient._instance = None
+                logger.success("Synchronous Redis connection closed")
+            except Exception as e:
+                logger.warning(f"Error closing Redis connection: {str(e)}")
+
+
+class AsyncRedisClient:
+    """
+    Singleton class for managing an asynchronous Redis client.
+    """
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            try:
+                cls._instance = aioredis.Redis(
+                    host=settings.REDIS_HOST,
+                    port=settings.REDIS_PORT,
+                    db=settings.REDIS_DB,
+                    decode_responses=True,
+                    password=settings.REDIS_PASSWORD,
+                )
+                logger.success("Asynchronous Redis client initialized")
+            except Exception as e:
+                logger.exception(f"Error initializing async Redis client: {str(e)}")
+                raise
+        return cls._instance
+
+    @staticmethod
+    async def close():
+        """
+        Close the asynchronous Redis connection.
+        """
+        if AsyncRedisClient._instance is not None:
+            try:
+                await AsyncRedisClient._instance.close()
+                AsyncRedisClient._instance = None
+                logger.success("Asynchronous Redis connection closed")
+            except Exception as e:
+                logger.warning(f"Error closing async Redis connection: {str(e)}")
+
+
 def get_redis_client():
     """
     Get a synchronous Redis client instance.
@@ -25,23 +99,7 @@ def get_redis_client():
     redis.Redis
         A Redis client instance.
     """
-    global _redis_client
-
-    if _redis_client is None:
-        try:
-            _redis_client = redis.Redis(
-                host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB,
-                decode_responses=True,
-                password=settings.REDIS_PASSWORD,
-            )
-            logger.success("Synchronous Redis client initialized")
-        except Exception as e:
-            logger.exception(f"Error initializing Redis client: {str(e)}")
-            raise
-
-    return _redis_client
+    return RedisClient()
 
 
 async def get_redis_async_client():
@@ -53,23 +111,7 @@ async def get_redis_async_client():
     redis.asyncio.Redis
         An asynchronous Redis client instance.
     """
-    global _redis_async_client
-
-    if _redis_async_client is None:
-        try:
-            _redis_async_client = await aioredis.Redis(
-                host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB,
-                decode_responses=True,
-                password=settings.REDIS_PASSWORD,
-            )
-            logger.success("Asynchronous Redis client initialized")
-        except Exception as e:
-            logger.exception(f"Error initializing async Redis client: {str(e)}")
-            raise
-
-    return _redis_async_client
+    return AsyncRedisClient()
 
 
 async def close_redis_connections():
@@ -78,20 +120,5 @@ async def close_redis_connections():
 
     This function should be called when the application shuts down.
     """
-    global _redis_client, _redis_async_client
-
-    if _redis_client is not None:
-        try:
-            _redis_client.close()
-            _redis_client = None
-            logger.success("Synchronous Redis connection closed")
-        except Exception as e:
-            logger.warning(f"Error closing Redis connection: {str(e)}")
-
-    if _redis_async_client is not None:
-        try:
-            await _redis_async_client.close()
-            _redis_async_client = None
-            logger.success("Asynchronous Redis connection closed")
-        except Exception as e:
-            logger.warning(f"Error closing async Redis connection: {str(e)}")
+    RedisClient.close()
+    await AsyncRedisClient.close()

@@ -2,7 +2,21 @@ import openai
 
 from app.core.config import settings
 
-_openai_async_client = None
+
+class OpenAIClientSingleton:
+    """
+    Singleton class for managing an asynchronous OpenAI client.
+    """
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            try:
+                cls._instance = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            except Exception as e:
+                raise RuntimeError(f"Error initializing OpenAI client: {str(e)}")
+        return cls._instance
 
 
 def get_openai_async_client():
@@ -14,9 +28,4 @@ def get_openai_async_client():
     openai.AsyncOpenAI
         An asynchronous OpenAI client instance.
     """
-    global _openai_async_client
-
-    if _openai_async_client is None:
-        _openai_async_client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-
-    return _openai_async_client
+    return OpenAIClientSingleton()
