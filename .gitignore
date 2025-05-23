@@ -45,4 +45,7 @@ Thumbs.db
 
 # Project specific
 *.log
-logs/ 
+logs/
+.env.dev
+.env.local
+.env.prod
