@@ -1,7 +1,14 @@
+import os
 import secrets
 from typing import Optional
 
 from pydantic_settings import BaseSettings
+
+env_file_mappings = {
+    "development": ".env.dev",
+    "local": ".env.local",
+    "production": ".env.prod",
+}
 
 
 class Settings(BaseSettings):
@@ -42,7 +49,7 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         extra = "allow"
-        env_file = ".env"
+        env_file = env_file_mappings[os.getenv("ENVIRONMENT", "development")]
 
 
 settings = Settings()
