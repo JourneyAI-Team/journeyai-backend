@@ -1,3 +1,9 @@
+"""
+This module sets up a queue for Python RQ.
+
+It contains all the queues needed for the application in one file.
+"""
+
 from redis import Redis
 from rq import Queue
 
