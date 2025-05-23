@@ -9,14 +9,14 @@ from app.api.deps import get_current_user
 from app.models.artifact import Artifact
 from app.models.session import Session
 from app.models.user import User
-from app.schemas.artifact import ArtifactCreate, ArtifactRead, ArtifactUpdate
+from app.schemas.artifact import ArtifactCreate, ArtifactUpdate
 from app.tasks.artifact_tasks import post_artifact_creation
 from app.tasks.queues import artifacts_queue
 
 router = APIRouter()
 
 
-@router.post("/", response_model=ArtifactRead)
+@router.post("/", response_model=Artifact)
 async def create_artifact(
     artifact: ArtifactCreate, current_user: User = Depends(get_current_user)
 ):
@@ -30,14 +30,15 @@ async def create_artifact(
 
     Returns
     -----
-    new_artifact: ArtifactRead
-        Returns a masked artifact information object.
+    new_artifact: Artifact
+        Returns the newly created artifact.
 
     Raises
     -----
     404 if session tied to the artifact does not exist.
     500 if database insert fails.
     """
+
     with logger.contextualize(
         user_id=current_user.id, organization_id=current_user.organization_id
     ):
@@ -107,7 +108,7 @@ async def create_artifact(
     return new_artifact
 
 
-@router.get("/", response_model=List[ArtifactRead])
+@router.get("/", response_model=List[Artifact])
 async def list_artifacts(
     account_id: str,
     opportunity_id: str | None = None,
@@ -128,7 +129,7 @@ async def list_artifacts(
 
     Returns
     -----
-    artifacts : list(ArtifactRead)
+    artifacts : list(Artifact)
         List of artifact objects.
     """
     with logger.contextualize(
@@ -149,7 +150,7 @@ async def list_artifacts(
     return artifacts
 
 
-@router.patch("/{artifact_id}", response_model=ArtifactRead)
+@router.patch("/{artifact_id}", response_model=Artifact)
 async def update_artifact(
     artifact_id: str,
     artifact_in: ArtifactUpdate,
@@ -168,7 +169,7 @@ async def update_artifact(
 
     Returns
     -----
-    artifact : ArtifactRead
+    artifact : Artifact
         The artifact's newly updated information object.
 
     Raises
