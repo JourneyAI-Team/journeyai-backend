@@ -34,15 +34,15 @@ async def initialize_app():
 
     logger.info("Initializing database...")
     await init_db()
-    logger.info("Database initialized successfully")
+    logger.success("Database initialized successfully")
 
     logger.info("Initializing Qdrant database...")
     await init_qdrant_db()
-    logger.info("Qdrant database initialized successfully")
+    logger.success("Qdrant database initialized successfully")
 
     logger.info("Starting Redis listener...")
     await start_redis_listener()
-    logger.info("Redis listener started successfully")
+    logger.success("Redis listener started successfully")
 
 
 async def initialize_worker(name: str):
@@ -63,8 +63,8 @@ async def initialize_worker(name: str):
 
     logger.info("Initializing database...")
     await init_db()
-    logger.info("Database initialized successfully")
+    logger.success("Database initialized successfully")
 
     logger.info("Initializing Qdrant database...")
     await init_qdrant_db()
-    logger.info("Qdrant database initialized successfully")
+    logger.success("Qdrant database initialized successfully")

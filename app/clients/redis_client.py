@@ -36,7 +36,7 @@ def get_redis_client():
                 decode_responses=True,
                 password=settings.REDIS_PASSWORD,
             )
-            logger.debug("Synchronous Redis client initialized")
+            logger.success("Synchronous Redis client initialized")
         except Exception as e:
             logger.exception(f"Error initializing Redis client: {str(e)}")
             raise
@@ -64,7 +64,7 @@ async def get_redis_async_client():
                 decode_responses=True,
                 password=settings.REDIS_PASSWORD,
             )
-            logger.debug("Asynchronous Redis client initialized")
+            logger.success("Asynchronous Redis client initialized")
         except Exception as e:
             logger.exception(f"Error initializing async Redis client: {str(e)}")
             raise
@@ -84,7 +84,7 @@ async def close_redis_connections():
         try:
             _redis_client.close()
             _redis_client = None
-            logger.debug("Synchronous Redis connection closed")
+            logger.success("Synchronous Redis connection closed")
         except Exception as e:
             logger.warning(f"Error closing Redis connection: {str(e)}")
 
@@ -92,6 +92,6 @@ async def close_redis_connections():
         try:
             await _redis_async_client.close()
             _redis_async_client = None
-            logger.debug("Asynchronous Redis connection closed")
+            logger.success("Asynchronous Redis connection closed")
         except Exception as e:
             logger.warning(f"Error closing async Redis connection: {str(e)}")
