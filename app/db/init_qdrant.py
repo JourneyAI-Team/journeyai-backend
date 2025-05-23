@@ -7,6 +7,7 @@ async def init_qdrant_db():
     """
     Initialize qdrant collections
     """
+
     client = get_async_qdrant_client()
     if not await client.collection_exists("Artifacts"):
         await client.create_collection(

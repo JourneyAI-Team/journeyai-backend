@@ -7,29 +7,14 @@ import app.api.v1.websockets.handlers
 from app.api.v1.router import api_router
 from app.clients.redis_client import close_redis_connections
 from app.core.config import settings
-from app.db.init_db import init_db
-from app.db.init_qdrant_db import init_qdrant_db
-from app.utils.loki_logger import setup_logger
-from app.utils.websocket.redis_listener import start_redis_listener, stop_redis_listener
+from app.core.starters import initialize_app
+from app.utils.websocket.redis_listener import stop_redis_listener
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
 
-    if settings.LOKI_URL:
-
-        setup_logger(
-            settings.LOKI_URL,
-            labels={"job": "journey", "environment": settings.ENVIRONMENT},
-        )
-
-    await init_db()
-
-    await init_qdrant_db()
-
-    # Start Redis listener for WebSocket messages
-    await start_redis_listener()
-
+    await initialize_app()
     yield
 
     # Stop Redis listener when shutting down
