@@ -1,6 +1,7 @@
-from app.core.config import settings
-from rq import Queue
 from redis import Redis
+from rq import Queue
+
+from app.core.config import settings
 
 redis_url = Redis(
     host=settings.REDIS_HOST,
