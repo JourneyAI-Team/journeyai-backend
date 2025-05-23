@@ -68,13 +68,7 @@ async def create_artifact(
         )
 
         try:
-            # await new_artifact.insert()
-            # artifact_json = new_artifact.model_dump_json()
-            # await post_artifact_creation.apply_async()
-            job = artifacts_queue.enqueue(post_artifact_creation)
-            print(job.return_value())
-            time.sleep(2)
-            print(job.return_value())
+            await new_artifact.insert()
             logger.success(f"Artifact created successfully. {artifact.title=}")
         except Exception as e:
             logger.exception(
