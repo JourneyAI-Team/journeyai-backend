@@ -1,15 +1,3 @@
-import os
-import asyncio
-
-from app.tasks.worker import celery_app
-from app.external.ai_service import get_embeddings
-
-from app.utils.constructor_utils import construct_embedding_input_for_artifact
-from app.utils.qdrant_client import insert_vector
-
-from app.models.artifact import Artifact
-
-
 def post_artifact_creation():
     print("HELLOOOOOO")
     # # Generate embeddings from artifact
