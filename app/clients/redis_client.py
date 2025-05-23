@@ -11,10 +11,6 @@ from loguru import logger
 
 from app.core.config import settings
 
-# Singleton instances
-_redis_client = None
-_redis_async_client = None
-
 
 class RedisClient:
     """
