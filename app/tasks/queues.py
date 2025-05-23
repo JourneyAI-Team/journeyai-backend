@@ -4,16 +4,8 @@ This module sets up a queue for Python RQ.
 It contains all the queues needed for the application in one file.
 """
 
-from redis import Redis
 from rq import Queue
 
-from app.core.config import settings
+from app.utils.redis_client import get_redis_client
 
-redis_url = Redis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    password=settings.REDIS_PASSWORD,
-    db=settings.REDIS_DB,
-)
-
-artifacts_queue = Queue("artifacts_queue", connection=redis_url)
+artifacts_queue = Queue("artifacts_queue", connection=get_redis_client())
