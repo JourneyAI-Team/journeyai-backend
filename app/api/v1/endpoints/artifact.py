@@ -1,16 +1,14 @@
-import time
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 
 from app.api.deps import get_current_user
+from app.clients.arq_client import get_arq
 from app.models.artifact import Artifact
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.artifact import ArtifactCreate, ArtifactUpdate
-from app.tasks.artifact_tasks import post_artifact_creation
-from app.tasks.queues import artifacts_queue
 
 router = APIRouter()
 
@@ -37,6 +35,8 @@ async def create_artifact(
     404 if session tied to the artifact does not exist.
     500 if database insert fails.
     """
+
+    arq = await get_arq()
 
     with logger.contextualize(
         user_id=current_user.id, organization_id=current_user.organization_id
@@ -69,6 +69,12 @@ async def create_artifact(
 
         try:
             await new_artifact.insert()
+            await arq.enqueue_job(
+                "post_artifact_creation",
+                new_artifact.id,
+                _queue_name="artifacts",
+            )
+
             logger.success(f"Artifact created successfully. {artifact.title=}")
         except Exception as e:
             logger.exception(
@@ -78,26 +84,6 @@ async def create_artifact(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error creating artifact.",
             ) from e
-
-        # Generate embeddings from artifact
-        # embedding_input = construct_embedding_input_for_artifact(
-        #     title=new_artifact.title, body=new_artifact.body, source="user"
-        # )
-
-        # artifact_embeddings = await get_embeddings(embedding_input, source="user")
-
-        # # Save embeddings to Qdrant
-        # await insert_vector(
-        #     collection_name="Artifacts",
-        #     id=new_artifact.id,
-        #     payload={
-        #         "session_id": new_artifact.session_id,
-        #         "user_id": new_artifact.user_id,
-        #         "organization_id": new_artifact.organization_id,
-        #         "account_id": new_artifact.account_id,
-        #     },
-        #     vector=artifact_embeddings,
-        # )
     return new_artifact
 
 
