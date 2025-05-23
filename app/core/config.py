@@ -33,6 +33,7 @@ class Settings(BaseSettings):
 
     # Qdrant
     QDRANT_URL: str | None = None
+    QDRANT_API_KEY: str | None = None
 
     # Redis
     REDIS_HOST: str = "localhost"
