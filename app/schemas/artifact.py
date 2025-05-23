@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 
 from app.schemas.types import OriginType
@@ -30,36 +29,9 @@ class ArtifactCreate(ArtifactBase):
 
     type: str
     origin_type: OriginType
-    title: str
-    body: str
-    is_parent: bool
-    parent_id: str | None
+    is_parent: bool = False
+    parent_id: str | None = None
     session_id: str
-
-
-class ArtifactRead(ArtifactBase):
-    """
-    Schema for reading artifact data.
-
-    Parameters
-    -----
-    id : str
-        Artifact unique identifier
-    type : str
-    origin_type : OriginType
-    title : str
-    body : str
-    is_parent : bool
-    parent_id : str, optional
-    """
-
-    id: str
-    type: str
-    origin_type: OriginType
-    title: str
-    body: str
-    is_parent: bool
-    parent_id: str | None
 
 
 class ArtifactUpdate(ArtifactBase):

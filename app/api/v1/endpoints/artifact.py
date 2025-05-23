@@ -1,23 +1,22 @@
+import asyncio
+import time
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 
 from app.api.deps import get_current_user
-from app.external.ai_service import get_embeddings
-
-from app.utils.qdrant_client import insert_vector
-from app.utils.constructor_utils import construct_embedding_input_for_artifact
-
 from app.models.artifact import Artifact
 from app.models.session import Session
 from app.models.user import User
-from app.schemas.artifact import ArtifactCreate, ArtifactRead, ArtifactUpdate
+from app.schemas.artifact import ArtifactCreate, ArtifactUpdate
+from app.tasks.artifact_tasks import post_artifact_creation
+from app.tasks.queues import artifacts_queue
 
 router = APIRouter()
 
 
-@router.post("/", response_model=ArtifactRead)
+@router.post("/", response_model=Artifact)
 async def create_artifact(
     artifact: ArtifactCreate, current_user: User = Depends(get_current_user)
 ):
@@ -31,14 +30,15 @@ async def create_artifact(
 
     Returns
     -----
-    new_artifact: ArtifactRead
-        Returns a masked artifact information object.
+    new_artifact: Artifact
+        Returns the newly created artifact.
 
     Raises
     -----
     404 if session tied to the artifact does not exist.
     500 if database insert fails.
     """
+
     with logger.contextualize(
         user_id=current_user.id, organization_id=current_user.organization_id
     ):
@@ -69,7 +69,13 @@ async def create_artifact(
         )
 
         try:
-            await new_artifact.insert()
+            # await new_artifact.insert()
+            # artifact_json = new_artifact.model_dump_json()
+            # await post_artifact_creation.apply_async()
+            job = artifacts_queue.enqueue(post_artifact_creation)
+            print(job.return_value())
+            time.sleep(2)
+            print(job.return_value())
             logger.success(f"Artifact created successfully. {artifact.title=}")
         except Exception as e:
             logger.exception(
@@ -81,28 +87,28 @@ async def create_artifact(
             ) from e
 
         # Generate embeddings from artifact
-        embedding_input = construct_embedding_input_for_artifact(
-            title=new_artifact.title, body=new_artifact.body, source="user"
-        )
+        # embedding_input = construct_embedding_input_for_artifact(
+        #     title=new_artifact.title, body=new_artifact.body, source="user"
+        # )
 
-        artifact_embeddings = await get_embeddings(embedding_input, source="user")
+        # artifact_embeddings = await get_embeddings(embedding_input, source="user")
 
-        # Save embeddings to Qdrant
-        await insert_vector(
-            collection_name="Artifacts",
-            id=new_artifact.id,
-            payload={
-                "session_id": new_artifact.session_id,
-                "user_id": new_artifact.user_id,
-                "organization_id": new_artifact.organization_id,
-                "account_id": new_artifact.account_id,
-            },
-            vector=artifact_embeddings,
-        )
+        # # Save embeddings to Qdrant
+        # await insert_vector(
+        #     collection_name="Artifacts",
+        #     id=new_artifact.id,
+        #     payload={
+        #         "session_id": new_artifact.session_id,
+        #         "user_id": new_artifact.user_id,
+        #         "organization_id": new_artifact.organization_id,
+        #         "account_id": new_artifact.account_id,
+        #     },
+        #     vector=artifact_embeddings,
+        # )
     return new_artifact
 
 
-@router.get("/", response_model=List[ArtifactRead])
+@router.get("/", response_model=List[Artifact])
 async def list_artifacts(
     account_id: str,
     opportunity_id: str | None = None,
@@ -123,7 +129,7 @@ async def list_artifacts(
 
     Returns
     -----
-    artifacts : list(ArtifactRead)
+    artifacts : list(Artifact)
         List of artifact objects.
     """
     with logger.contextualize(
@@ -144,7 +150,7 @@ async def list_artifacts(
     return artifacts
 
 
-@router.patch("/{artifact_id}", response_model=ArtifactRead)
+@router.patch("/{artifact_id}", response_model=Artifact)
 async def update_artifact(
     artifact_id: str,
     artifact_in: ArtifactUpdate,
@@ -163,7 +169,7 @@ async def update_artifact(
 
     Returns
     -----
-    artifact : ArtifactRead
+    artifact : Artifact
         The artifact's newly updated information object.
 
     Raises

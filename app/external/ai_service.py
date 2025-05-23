@@ -2,8 +2,7 @@ from typing import List
 
 from loguru import logger
 
-from app.schemas.types import EmbeddingInputSourceType
-from app.utils.openai_client import get_openai_async_client
+from app.clients.openai_client import get_openai_async_client
 
 
 async def get_embeddings(embedding_input: str) -> List[float]:
@@ -24,6 +23,7 @@ async def get_embeddings(embedding_input: str) -> List[float]:
     embeddings : list(float)
         Returns the vector embeddings result which is a list of floating point numbers of size 1536.
     """
+
     client = get_openai_async_client()
     try:
         response = await client.embeddings.create(

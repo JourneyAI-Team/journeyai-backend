@@ -12,7 +12,7 @@ from typing import Any, Dict
 
 from loguru import logger
 
-from app.utils.redis_client import get_redis_async_client
+from app.clients.redis_client import get_redis_async_client
 from app.utils.websocket.handlers import active_connections, broadcast, send_message
 
 
