@@ -1,6 +1,6 @@
 from qdrant_client import models
 
-from app.utils.qdrant_client import get_async_qdrant_client
+from app.clients.qdrant_client import get_async_qdrant_client
 
 
 async def init_qdrant_db():

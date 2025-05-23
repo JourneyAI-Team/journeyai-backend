@@ -10,7 +10,7 @@ from typing import Any, Dict
 
 from loguru import logger
 
-from app.utils.redis_client import get_redis_client
+from app.clients.redis_client import get_redis_client
 
 
 async def send_to_websocket(
