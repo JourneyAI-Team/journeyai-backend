@@ -1,9 +1,7 @@
 from typing import Any
 
-from app.models.user import User
 from app.models.message import Message
-
-
+from app.models.user import User
 from app.utils.websocket.handlers import register_handler
 
 
@@ -21,5 +19,3 @@ async def ingest_message(connection_id: str, user: User, data: dict[str, Any]):
     )
 
     await new_user_message.insert()
-
-    pass
