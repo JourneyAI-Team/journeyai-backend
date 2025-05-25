@@ -26,4 +26,4 @@ class Artifact(Document):
     parent_id: str | None = None
 
     # Scoping
-    account_id: str | None = None
+    account_id: str
