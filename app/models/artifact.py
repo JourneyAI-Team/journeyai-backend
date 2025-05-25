@@ -24,4 +24,4 @@ class Artifact(Document):
     organization_id: str
     account_id: str
     session_id: str
-    parent_id: str | None
+    parent_id: str | None = None
