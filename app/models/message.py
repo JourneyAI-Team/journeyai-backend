@@ -1,14 +1,13 @@
-from typing import Optional
-
 import datetime as dt
 import uuid
+from typing import Optional
 
 from beanie import Document
 from openai.types.responses import ResponseOutputItem
 from pydantic import Field
 
-from app.schemas.types import SenderType
 from app.schemas.message import InputMessageSchema
+from app.schemas.types import SenderType
 
 
 class Message(Document):
