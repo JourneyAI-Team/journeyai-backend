@@ -1,7 +1,7 @@
 """
-Celery to WebSocket communication utilities.
+Arq to WebSocket communication utilities.
 
-This module provides utilities for Celery tasks to communicate with
+This module provides utilities for arq tasks to communicate with
 WebSocket connections, even though they are in different processes.
 """
 
@@ -17,9 +17,9 @@ async def send_to_websocket(
     connection_id: str, event: str, data: Dict[str, Any]
 ) -> bool:
     """
-    Send a message to a WebSocket connection from a Celery task.
+    Send a message to a WebSocket connection from a arq task.
 
-    This function uses Redis pub/sub to communicate between the Celery task
+    This function uses Redis pub/sub to communicate between the arq task
     and the WebSocket server process.
 
     Parameters
@@ -51,7 +51,7 @@ async def send_to_websocket(
 
 async def send_to_all_websockets(event: str, data: Dict[str, Any]) -> bool:
     """
-    Broadcast a message to all active WebSocket connections from a Celery task.
+    Broadcast a message to all active WebSocket connections from a arq task.
 
     Parameters
     ----------

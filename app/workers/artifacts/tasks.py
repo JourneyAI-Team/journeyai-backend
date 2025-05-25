@@ -30,3 +30,5 @@ async def post_artifact_creation(ctx, id: str):
         },
         vector=artifact_embeddings,
     )
+
+    logger.success(f"Successfully embedded artifact: {artifact.title}")
