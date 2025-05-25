@@ -1,47 +1,30 @@
 # Journey
 
-Welcome to the Journey AI Repository!
+Welcome to the Journey AI Repository! This README.md file will go over how to setup the local development environment.
 
 ---
 
 ## Prerequisites
 * Python 3.10+
 * [Poetry](https://python-poetry.org/docs/#installation)
+* Docker and Docker Compose
 
 ---
 
 ## Installation
 
+Run the following command to install the dependencies and create a `.env.local` file.
 ```bash
-poetry install
+make setup-local
 ```
 
----
+After setup, external API keys and other unfilled fields must be filled in the generated `.env.local`.
 
-## Environment variables
+## Running
 
-The application expects a `.env` file in the project root.
-
-1. Open the **Journey** vault in 1Password.  
-2. Copy the note that contains the `.env` contents.  
-3. Create a file named `.env` in the project root and paste the copied text.
+You can then run `make run-local` to actually run the app locally. The host and port will be `0.0.0.0:8000`.
 
 ---
 
-## Running the application locally
+For additional README docs such as developing with the app, check `docs/`.
 
-To start the application, use the following command:
-
-```bash
-honcho -e {env_file} start
-```
-
-Replace `{env_file}` with the path to your `.env` file.
-
----
-
-## Managing Workers
-
-Workers are managed through the `Procfile` and will run automatically when you start the application with `honcho`. If you need to add new workers, ensure they are added to the `Procfile`.
-
----
