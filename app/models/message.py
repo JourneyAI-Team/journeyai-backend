@@ -1,6 +1,5 @@
 import datetime as dt
 import uuid
-from typing import Optional
 
 from beanie import Document
 from openai.types.responses import ResponseOutputItem
@@ -13,8 +12,8 @@ from app.schemas.types import SenderType
 class Message(Document):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
 
-    output: Optional[ResponseOutputItem]
-    input: Optional[InputMessageSchema]
+    output: ResponseOutputItem | None = None
+    input: InputMessageSchema | None = None
     sender: SenderType
 
     created_at: dt.datetime = Field(
