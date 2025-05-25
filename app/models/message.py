@@ -27,3 +27,4 @@ class Message(Document):
     organization_id: str
     session_id: str
     assistant_id: str
+    account_id: str
