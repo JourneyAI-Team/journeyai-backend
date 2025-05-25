@@ -14,7 +14,7 @@ class Artifact(Document):
     origin_type: OriginType
     title: str
     body: str
-    is_parent: bool
+    is_parent: bool = False
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
     )
@@ -22,6 +22,8 @@ class Artifact(Document):
     # Relations
     user_id: str
     organization_id: str
+    session_id: str | None = None  # Exists if artifact is created from within a session
+    parent_id: str | None = None
+
+    # Scoping
     account_id: str
-    session_id: str
-    parent_id: str | None

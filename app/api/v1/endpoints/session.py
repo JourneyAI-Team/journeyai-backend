@@ -3,7 +3,6 @@ from loguru import logger
 
 from app.api.deps import get_current_user
 from app.models.account import Account
-from app.models.assistant import Assistant
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.session import SessionCreate, SessionRead, SessionUpdate
@@ -11,30 +10,19 @@ from app.schemas.session import SessionCreate, SessionRead, SessionUpdate
 router = APIRouter()
 
 
-@router.post("/", response_model=SessionRead)
+@router.post(
+    "/",
+    response_model=SessionRead,
+    status_code=status.HTTP_201_CREATED,
+    description="Create a new session under an account.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Account could not be found."},
+    },
+)
 async def create_session(
     session: SessionCreate,
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Create a new session under an account.
-    Can create multiple sessions under an account.
-
-    Parameters
-    -----
-        session : SessionCreate
-            Request body. Fields required to create a new session.
-
-    Returns
-    -----
-        SessionRead
-            Returns the newly created session information.
-
-    Raises
-    -----
-    HTTPException
-        404 if account or assistant could not be found.
-    """
 
     with logger.contextualize(
         user_id=current_user.id, organization_id=current_user.organization_id
@@ -79,29 +67,18 @@ async def create_session(
         return new_session
 
 
-@router.get("/{session_id}", response_model=SessionRead)
+@router.get(
+    "/{session_id}",
+    response_model=SessionRead,
+    description="Retrieve a session under an account by its id.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Session could not be found."},
+    },
+)
 async def get_session(
     session_id: str,
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Get a session under an account by its id.
-
-    Parameters
-    -----
-    session_id : str
-        Path parameter. The session id to retrieve.
-
-    Returns
-    -----
-    SessionRead
-        The session information.
-
-    Raises
-    -----
-    HTTPException
-        404 if session could not be found.
-    """
     with logger.contextualize(
         user_id=current_user.id,
         organization_id=current_user.organization_id,
@@ -124,32 +101,19 @@ async def get_session(
         return session
 
 
-@router.patch("/{session_id}")
+@router.patch(
+    "/{session_id}",
+    response_model=SessionRead,
+    description="Update a session's title and/or summary.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Session could not be found."},
+    },
+)
 async def update_session(
     session_id: str,
     session_in: SessionUpdate,
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Update a session's title and/or summary.
-
-    Parameters
-    -----
-    session_id: str
-        Path parameter. The session's id to update.
-    session_in: SessionUpdate
-        Request Body. Fields that can be updated.
-
-    Returns
-    -----
-    dict
-        Empty Dictionary
-
-    Raises
-    -----
-    HTTPException
-        404 if session could not be found.
-    """
     with logger.contextualize(
         user_id=current_user.id,
         organization_id=current_user.organization_id,
@@ -170,37 +134,24 @@ async def update_session(
             )
 
         # Update the account, only description is allowed to be updated
-        await session.set(
-            {Session.summary: session_in.summary, Session.title: session_in.title}
-        )
+        await session.set(session_in)
         logger.success("Session updated successfully.")
 
-        return {}
+        return session
 
 
-@router.delete("/{session_id}")
+@router.delete(
+    "/{session_id}",
+    description="Delete a session.",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Session could not be found."},
+    },
+)
 async def delete_session(
     session_id: str,
     current_user: User = Depends(get_current_user),
 ):
-    """
-    Delete a session.
-
-    Parameters
-    -----
-    session_id: str
-        Path parameter. The session's id to delete.
-
-    Returns
-    -----
-    dict
-        Empty dictionary.
-
-    Raises
-    -----
-    HTTPException
-        404 if session could not be found.
-    """
     with logger.contextualize(
         user_id=current_user.id,
         organization_id=current_user.organization_id,
@@ -221,4 +172,3 @@ async def delete_session(
             )
         await session.delete()
         logger.success("Session deleted successfully.")
-        return {}
