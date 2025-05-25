@@ -1,8 +1,10 @@
-from typing import List
-
-from pydantic import BaseModel, Field
+from typing_extensions import TypedDict
 
 
-class InputMessageSchema(BaseModel):
+class InputMessageSchema(TypedDict):
     content: str
-    attachments: List[str] = Field(default_factory=list)
+    attachments: list[str]
+
+    assistant_id: str
+    session_id: str
+    account_id: str
