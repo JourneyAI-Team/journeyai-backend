@@ -2,7 +2,7 @@
 Redis message listener for WebSockets.
 
 This module listens for messages from Redis and relays them to the appropriate
-WebSocket connections. This allows Celery tasks to communicate with WebSockets
+WebSocket connections. This allows arq tasks to communicate with WebSockets
 despite being in separate processes.
 """
 
@@ -20,7 +20,7 @@ class RedisListener:
     """
     Redis listener for WebSocket messages.
 
-    Listens for messages published by Celery tasks and relays them to
+    Listens for messages published by arq tasks and relays them to
     the appropriate WebSocket connections.
     """
 
