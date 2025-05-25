@@ -14,7 +14,7 @@ class Artifact(Document):
     origin_type: OriginType
     title: str
     body: str
-    is_parent: bool
+    is_parent: bool = False
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
     )
