@@ -22,6 +22,8 @@ class Artifact(Document):
     # Relations
     user_id: str
     organization_id: str
-    account_id: str
-    session_id: str
+    session_id: str | None = None  # Exists if artifact is created from within a session
     parent_id: str | None = None
+
+    # Scoping
+    account_id: str | None = None
