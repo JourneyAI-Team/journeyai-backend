@@ -143,9 +143,9 @@ async def list_artifacts(
             query,
         ).to_list()
 
-    logger.info(f"Found {len(artifacts)} artifacts.")
+        logger.info(f"Found {len(artifacts)} artifacts.")
 
-    return artifacts
+        return artifacts
 
 
 @router.patch(
@@ -226,6 +226,15 @@ async def delete_artifact(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Artifact could not be found.",
             )
-        # Delete the artifact
-        await artifact.delete()
-        logger.success("Session deleted successfully.")
+        try:
+            # Delete the artifact
+            await artifact.delete()
+            logger.success("Session deleted successfully.")
+        except Exception as e:
+            logger.exception(
+                f"Database delete failed when deleting artifact. {artifact.id=}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error deleting artifact.",
+            ) from e
