@@ -54,13 +54,13 @@ class RedisListener:
         while self.running:
             try:
                 message = await self.pubsub.get_message(
-                    ignore_subscribe_messages=True, timeout=1.0
+                    ignore_subscribe_messages=True, timeout=0.1
                 )
                 if message:
                     await self.process_message(message)
 
-                # Small sleep to prevent CPU hogging
-                await asyncio.sleep(0.01)
+                # Reduced sleep to increase message fetch rate
+                await asyncio.sleep(0.001)
 
             except Exception as e:
                 logger.exception(f"Error processing Redis message: {str(e)}")
