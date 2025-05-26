@@ -23,6 +23,3 @@ class Assistant(Document):
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
     )
-
-    # Relations
-    organization_id: str
