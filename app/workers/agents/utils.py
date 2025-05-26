@@ -53,5 +53,6 @@ async def fetch_message_history(session_id: str, limit: int = 100) -> list[Messa
         await Message.find(Message.session_id == session_id)
         .sort("-created_at")
         .limit(limit)
+        .to_list()
     )
-    return list(messages)
+    return list(reversed(messages))
