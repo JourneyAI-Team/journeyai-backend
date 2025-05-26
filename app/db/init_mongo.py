@@ -3,8 +3,9 @@ from loguru import logger
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.core.config import settings
-from app.models.artifact import Artifact
 from app.models.account import Account
+from app.models.artifact import Artifact
+from app.models.assistant import Assistant
 from app.models.crm import Contact, Opportunity
 from app.models.message import Message
 from app.models.organization import Organization
@@ -37,6 +38,7 @@ async def init_db():
             User,
             Opportunity,
             Contact,
+            Assistant,
         ],
     )
 
