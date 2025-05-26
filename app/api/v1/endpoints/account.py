@@ -167,10 +167,18 @@ async def update_account(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Account could not be found within the organization.",
             )
-
-        await account.set(account_in)
-        logger.success("Account updated successfully.")
-
+        try:
+            update_data = account_in.model_dump(exclude_unset=True)
+            await account.set(update_data)
+            logger.success("Account updated successfully.")
+        except Exception as e:
+            logger.exception(
+                f"Database update failed when updating account. {account_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error updating account.",
+            ) from e
     return account
 
 
@@ -208,6 +216,15 @@ async def delete_account(
                 detail="Account could not be found within the organization.",
             )
 
-        # Delete the account
-        await account.delete()
-        logger.success("Account deleted successfully.")
+        try:
+            # Delete the account
+            await account.delete()
+            logger.success("Account deleted successfully.")
+        except Exception as e:
+            logger.exception(
+                f"Database update failed when deleting account. {account_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error deleting account.",
+            ) from e
