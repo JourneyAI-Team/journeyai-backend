@@ -27,4 +27,3 @@ You can then run `make run-local` to actually run the app locally. The host and 
 ---
 
 For additional README docs such as developing with the app, check `docs/`.
-
