@@ -1,10 +1,10 @@
 import uuid
-
 from datetime import timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from loguru import logger
 
 from app.api.deps import get_current_user
 from app.core.config import settings
@@ -17,35 +17,21 @@ from app.schemas.user import UserCreate, UserRead
 router = APIRouter()
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    status_code=status.HTTP_200_OK,
+    description="""Obtain a bearer access token. \
+        This endpoint is OAuth 2 compatible. \
+        The user's credentials are validated and, if correct, a JWT token \
+        is issued. """,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {"description": " The credentials are invalid"}
+    },
+)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Any:
-    """
-    Obtain a bearer access token.
-
-    This endpoint is OAuth 2 compatible.
-    The user's credentials are validated and, if correct, a JWT token
-    is issued.
-
-    Parameters
-    ----------
-    form_data : OAuth2PasswordRequestForm, optional
-        Form that contains the user's e-mail (as *username*) and
-        password. Injected automatically by FastAPI.
-
-    Returns
-    -------
-    dict
-        Dictionary with two keys:
-        ``access_token`` - the generated JWT.
-        ``token_type`` - always ``"bearer"``.
-
-    Raises
-    ------
-    HTTPException
-        401 if the credentials are invalid.
-    """
     user = await User.find_one(User.email == form_data.username)
     if not user:
         raise HTTPException(
@@ -75,28 +61,18 @@ async def login(
     }
 
 
-@router.post("/register", response_model=Token)
+@router.post(
+    "/register",
+    response_model=Token,
+    status_code=status.HTTP_200_OK,
+    description="Register a new user.",
+    responses={
+        status.HTTP_400_BAD_REQUEST: {
+            "description": "User with the same email already exists."
+        }
+    },
+)
 async def register(user_in: UserCreate) -> Any:
-    """
-    Register a new user.
-
-    Parameters
-    ----------
-    user_in : UserCreate
-        Pydantic model with the data required to create a new user.
-
-    Returns
-    -------
-    dict
-        Same structure as the login endpoint:
-        ``access_token`` and ``token_type`` on successful registration.
-
-    Raises
-    ------
-    HTTPException
-        400 if a user with the same email already exists.
-    """
-
     # Check if user already exists
     existing_user = await User.find_one(User.email == user_in.email)
     if existing_user:
@@ -130,15 +106,24 @@ async def register(user_in: UserCreate) -> Any:
     api_key = uuid.uuid4().hex
     new_user.access_token = api_key
 
-    # Save user to database
-    await new_user.insert()
+    try:
+        # Save user to database
+        await new_user.insert()
 
-    # Generate access token
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        subject=str(new_user.id), expires_delta=access_token_expires
-    )
-
+        # Generate access token
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            subject=str(new_user.id), expires_delta=access_token_expires
+        )
+        logger.success(f"User registered successfully. {user_in.email}")
+    except Exception as e:
+        logger.exception(
+            f"Database insert failed when registering user. {user_in.email}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error registering user.",
+        ) from e
     return {
         "access_token": access_token,
         "api_key": api_key,
@@ -146,20 +131,11 @@ async def register(user_in: UserCreate) -> Any:
     }
 
 
-@router.get("/me", response_model=UserRead)
+@router.get(
+    "/me",
+    response_model=UserRead,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the currently authenticated user.",
+)
 async def get_me(current_user: User = Depends(get_current_user)) -> Any:
-    """
-    Retrieve the currently authenticated user.
-
-    Parameters
-    ----------
-    current_user : User, optional
-        The user resolved from the provided JWT. Supplied via the
-        ``get_current_user`` dependency.
-
-    Returns
-    -------
-    UserRead
-        The authenticated user object with sensitive information removed.
-    """
     return current_user
