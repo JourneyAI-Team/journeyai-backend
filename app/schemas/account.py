@@ -33,9 +33,10 @@ class AccountRead(AccountBase):
     user_id: str
 
 
-class AccountUpdate(AccountBase):
+class AccountUpdate(BaseModel):
     """
     Schema for updating account. Only account name and description can be updated for now.
     """
 
+    name: str | None = None
     description: str | None = None

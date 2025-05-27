@@ -36,9 +36,10 @@ class SessionRead(SessionBase):
     account_id: str
 
 
-class SessionUpdate(SessionBase):
+class SessionUpdate(BaseModel):
     """
     Session's updatable fields.
     """
 
+    title: str | None = None
     summary: str | None = None
