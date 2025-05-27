@@ -152,16 +152,26 @@ async def update_assistant(assistant_id: str, assistant_in: AssistantUpdate):
     },
 )
 async def delete_assistant(assistant_id: str):
-    logger.info(f"Delete assistant request received. {assistant_id}")
+    with logger.contextualize(assistant_id=assistant_id):
+        logger.info(f"Delete assistant request received. {assistant_id}")
 
-    assistant = await Assistant.find_one(Assistant.id == assistant_id)
-    if not assistant:
-        logger.warning(f"Assistant could not be found. {assistant_id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assistant could not be found.",
-        )
+        assistant = await Assistant.find_one(Assistant.id == assistant_id)
+        if not assistant:
+            logger.warning(f"Assistant could not be found. {assistant_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Assistant could not be found.",
+            )
 
-    # Delete the assistant
-    await assistant.delete()
-    logger.success(f"Assistant deleted successfully. {assistant_id}")
+        try:
+            # Delete the assistant
+            await assistant.delete()
+            logger.success(f"Assistant deleted successfully. {assistant_id}")
+        except Exception as e:
+            logger.exception(
+                f"Database delete failed when deleting assistant. {assistant_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error deleting assistant.",
+            ) from e
