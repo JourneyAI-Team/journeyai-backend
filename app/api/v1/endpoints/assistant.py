@@ -115,32 +115,33 @@ async def get_assistant(assistant_id: str):
     },
 )
 async def update_assistant(assistant_id: str, assistant_in: AssistantUpdate):
-    logger.info(f"Update assistant request received. {assistant_id}")
+    with logger.contextualize(assistant_id=assistant_id):
+        logger.info(f"Update assistant request received. {assistant_id}")
 
-    # Check if assistant exists
-    assistant = await Assistant.find_one(Assistant.id == assistant_id)
-    if not assistant:
-        logger.warning(f"Assistant does not exist. {assistant_id}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assistant does not exist.",
-        )
+        # Check if assistant exists
+        assistant = await Assistant.find_one(Assistant.id == assistant_id)
+        if not assistant:
+            logger.warning(f"Assistant does not exist. {assistant_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Assistant does not exist.",
+            )
 
-    try:
-        # Update the assistant with only provided fields
-        update_data = assistant_in.model_dump(exclude_unset=True)
-        await assistant.set(update_data)
-        logger.success(f"Assistant updated successfully. {assistant_id}")
-    except Exception as e:
-        logger.exception(
-            f"Database update failed when updating assistant. {assistant_id}"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error updating assistant.",
-        ) from e
+        try:
+            # Update the assistant with only provided fields
+            update_data = assistant_in.model_dump(exclude_unset=True)
+            await assistant.set(update_data)
+            logger.success(f"Assistant updated successfully. {assistant_id}")
+        except Exception as e:
+            logger.exception(
+                f"Database update failed when updating assistant. {assistant_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error updating assistant.",
+            ) from e
 
-    return assistant
+        return assistant
 
 
 @router.delete(
