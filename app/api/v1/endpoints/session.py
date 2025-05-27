@@ -3,6 +3,7 @@ from loguru import logger
 
 from app.api.deps import get_current_user
 from app.models.account import Account
+from app.models.assistant import Assistant
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.session import SessionCreate, SessionRead, SessionUpdate
@@ -39,31 +40,36 @@ async def create_session(
             )
 
         # Check if the assistant exists
-        # NOTE: Temporarily commented out this check since there's no way to save and retrieve assistants yet
-        # assistant = await Assistant.find_one(
-        #     Assistant.id == session.assistant_id
-        # )
-        # if not assistant:
-        #     raise HTTPException(
-        #         status_code=status.HTTP_404_NOT_FOUND,
-        #         detail="Assistant could not be found."
-        #     )
+        assistant = await Assistant.find_one(Assistant.id == session.assistant_id)
+        if not assistant:
+            logger.warning("Assistant could not be found.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Assistant could not be found.",
+            )
 
         # Create the new session
         new_session = Session(
             title=session.title,
             summary=session.summary,
             account_id=account.id,
-            # NOTE: Change to an actual assistant's id (assistant.id)
-            assistant_id="temporary_assistant_id",
+            assistant_id=session.assistant_id,
             user_id=current_user.id,
             organization_id=current_user.organization_id,
         )
 
-        # Save the new session to the database
-        await new_session.insert()
-        logger.success(f"Session created successfully. {new_session.title=}")
-
+        try:
+            # Save the new session to the database
+            await new_session.insert()
+            logger.success(f"Session created successfully. {new_session.title=}")
+        except Exception as e:
+            logger.exception(
+                f"Database insert failed when creating session. {new_session.title=}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error creating session.",
+            )
         return new_session
 
 
@@ -133,10 +139,18 @@ async def update_session(
                 detail="Session could not be found.",
             )
 
-        # Update the account, only description is allowed to be updated
-        await session.set(session_in)
-        logger.success("Session updated successfully.")
-
+        try:
+            update_data = session_in.model_dump(exclude_unset=True)
+            await session.set(update_data)
+            logger.success("Session updated successfully.")
+        except Exception as e:
+            logger.exception(
+                f"Database update failed when updating session. {session_in.title=}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error updating session.",
+            )
         return session
 
 
@@ -170,5 +184,14 @@ async def delete_session(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Session could not be found.",
             )
-        await session.delete()
-        logger.success("Session deleted successfully.")
+        try:
+            await session.delete()
+            logger.success("Session deleted successfully.")
+        except Exception as e:
+            logger.exception(
+                f"Database delete failed when deleting session. {session_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error deleting session.",
+            )
