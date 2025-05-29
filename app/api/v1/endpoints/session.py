@@ -31,7 +31,10 @@ async def create_session(
         logger.info(f"Create session request received. {session.title=}")
 
         # Check if the account exists
-        account = await Account.find_one(Account.id == session.account_id)
+        account = await Account.find_one(
+            Account.organization_id == current_user.organization_id,
+            Account.id == session.account_id,
+        )
         if not account:
             logger.warning("Account could not be found.")
             raise HTTPException(
