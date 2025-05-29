@@ -77,6 +77,52 @@ async def create_session(
 
 
 @router.get(
+    "/",
+    response_model=list[SessionRead],
+    description="List sessions under an account.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Session could not be found."},
+    },
+)
+async def list_sessions(
+    account_id: str,
+    current_user: User = Depends(get_current_user),
+):
+    with logger.contextualize(
+        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+        account_id=account_id,
+    ):
+        logger.info(f"List sessions request received.")
+
+        # Check if account exists
+        account = await Account.find_one(
+            Account.id == account_id,
+            Account.organization_id == current_user.organization_id,
+        )
+
+        if not account:
+            logger.warning("Account could not be found.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account could not be found.",
+            )
+
+        # Check if session exists
+        sessions = (
+            await Session.find(
+                Session.account_id == account.id,
+                Session.organization_id == current_user.organization_id,
+            )
+            .sort(-Session.created_at)
+            .to_list()
+        )
+
+        logger.success(f"Found {len(sessions)} sessions.")
+        return sessions
+
+
+@router.get(
     "/{session_id}",
     response_model=SessionRead,
     description="Retrieve a session under an account by its id.",
