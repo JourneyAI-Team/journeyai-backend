@@ -2,18 +2,16 @@ import datetime as dt
 import uuid
 
 from beanie import Document
-from openai.types.responses import ResponseOutputItem
 from pydantic import Field
 
-from app.schemas.message import InputMessageSchema
 from app.schemas.types import SenderType
 
 
 class Message(Document):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
 
-    output: ResponseOutputItem | None = None
-    input: InputMessageSchema | None = None
+    output: dict | None = None
+    input: dict | None = None
     sender: SenderType
 
     created_at: dt.datetime = Field(
