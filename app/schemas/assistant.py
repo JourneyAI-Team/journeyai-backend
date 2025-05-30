@@ -2,6 +2,9 @@ import datetime as dt
 
 from pydantic import BaseModel
 
+from app.models.assistant import AssistantToolConfig
+from app.schemas.types import ToolType
+
 
 class AssistantBase(BaseModel):
     """
@@ -11,7 +14,18 @@ class AssistantBase(BaseModel):
     name: str
     internal_name: str
     description: str
-    tool_config: dict[str, str] = {}
+    tool_config: AssistantToolConfig = {
+        "tools": [
+            {
+                "name": "save_artifact",
+                "type": ToolType.INTERNAL,
+            },
+            {
+                "name": "web_search",
+                "type": ToolType.EXTERNAL,
+            },
+        ]
+    }
     testing: bool = False
     version: str = "0.0.1"
     developer_prompt: str
