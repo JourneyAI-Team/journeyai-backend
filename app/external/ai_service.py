@@ -99,10 +99,10 @@ async def generate_response(
     session_id : str
         The session ID associated with the response.
 
-    Yields
-    ------
-    event
-        An event from the result stream of the response generation process.
+    Returns
+    -------
+    RunResultStreaming
+        The result of the response generation process.
     """
 
     user = await User.get(user_id)
