@@ -43,6 +43,8 @@ async def create_summary_for_search(messages: list[Message]) -> str:
         },
     ]
 
+    logger.info(f"Creating summary for search for {len(messages)} messages")
+
     if settings.GROQ_API_KEY:
         client = get_groq_async_client()
 
@@ -51,7 +53,7 @@ async def create_summary_for_search(messages: list[Message]) -> str:
             messages=llm_input,
         )
 
-        return chat_completion.choices[0].message.content
+        summary = chat_completion.choices[0].message.content
 
     elif settings.OPENAI_API_KEY:
         client = get_openai_async_client()
@@ -60,10 +62,14 @@ async def create_summary_for_search(messages: list[Message]) -> str:
             input=llm_input, model="chatgpt-4o-latest"
         )
 
-        return response.output_text
+        summary = response.output_text
 
     else:
         raise ValueError("No LLM provider configured. Cannot use any LLM service.")
+
+    logger.info(f"Summary for search: {summary}")
+
+    return summary
 
 
 async def get_embeddings(embedding_input: str) -> List[float]:
