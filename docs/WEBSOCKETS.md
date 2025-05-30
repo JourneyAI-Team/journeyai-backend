@@ -71,16 +71,17 @@ This document outlines the various event types and data formats used for WebSock
     }
     ```
   - **Tool Output:**
-    ```json
+     ```json
     {
       "kind": "tool_output",
       "tool": {
         "id": "<str>",
+        "call_id": "<str>",
+        "raw_output": "<str>",
         "output": "<str>"
       },
       "ts": "<ISO 8601 timestamp>"
     }
-    ```
   - **Handoff Requested:**
     ```json
     {
