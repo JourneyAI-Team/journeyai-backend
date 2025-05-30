@@ -1,5 +1,5 @@
 from loguru import logger
-from qdrant_client.models import PointStruct
+from qdrant_client.models import Filter, PointStruct, ScoredPoint
 
 from app.clients.qdrant_client import get_async_qdrant_client
 
@@ -33,4 +33,44 @@ async def insert_vector(
         await client.upsert(collection_name=collection_name, points=[points_struct])
     except Exception as e:
         logger.exception(f"Error inserting vector: {str(e)}")
+        raise
+
+
+async def search_vectors(
+    collection_name: str,
+    query_embedding: list[float],
+    top_k: int,
+    filter: Filter | None = None,
+) -> list[ScoredPoint]:
+    """
+    Search for vectors in a Qdrant collection.
+
+    Parameters
+    ----------
+    collection_name : str
+        The name of the collection to search in.
+    query_embedding : list[float]
+        The query vector to search for.
+    top_k : int
+        The number of top results to return.
+    filter : Filter | None
+        The filter to apply to the search.
+
+    Returns
+    -------
+    list
+        A list of search results.
+    """
+
+    client = get_async_qdrant_client()
+    try:
+        response = await client.search(
+            collection_name=collection_name,
+            query_vector=query_embedding,
+            limit=top_k,
+            query_filter=filter,
+        )
+        return response
+    except Exception as e:
+        logger.exception(f"Error searching vectors: {str(e)}")
         raise

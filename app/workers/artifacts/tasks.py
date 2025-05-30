@@ -27,6 +27,9 @@ async def post_artifact_creation(ctx, id: str):
             "user_id": artifact.user_id,
             "organization_id": artifact.organization_id,
             "account_id": artifact.account_id,
+            "title": artifact.title,
+            "body": artifact.body,
+            "origin": artifact.origin_type.value,
         },
         vector=artifact_embeddings,
     )

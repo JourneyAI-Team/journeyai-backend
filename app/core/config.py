@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     # OpenAI
     OPENAI_API_KEY: str | None = None
 
+    # Groq
+    GROQ_API_KEY: str | None = None
+
     class Config:
         case_sensitive = True
         extra = "allow"
