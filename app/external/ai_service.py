@@ -57,6 +57,9 @@ async def get_embeddings(embedding_input: str) -> List[float]:
         Returns the vector embeddings result which is a list of floating point numbers of size 1536.
     """
 
+    if not settings.OPENAI_API_KEY:
+        raise ValueError("No OpenAI API key provided. Cannot use embedding service.")
+
     client = get_openai_async_client()
     try:
         response = await client.embeddings.create(
