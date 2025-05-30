@@ -90,3 +90,5 @@ async def generate_response(
 
     async for event in result.stream_events():
         yield event
+
+    return result
