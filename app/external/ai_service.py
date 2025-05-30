@@ -88,7 +88,4 @@ async def generate_response(
     logger.info(f"Generating response using agent: {agent.name}")
     result = Runner.run_streamed(agent, input=input, context=agent_context)
 
-    async for event in result.stream_events():
-        yield event
-
     return result

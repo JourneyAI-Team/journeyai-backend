@@ -43,15 +43,16 @@ async def process_session(ctx, connection_id: str, session_id: str):
 
         # Convert the messages into a format OpenAI understands
         input = convert_messages_to_openai_format(messages)
-
-        async for event in generate_response(
+        result = await generate_response(
             agent,
             input,
             session.user_id,
             session.organization_id,
             session.account_id,
             session_id,
-        ):
+        )
+
+        async for event in result.stream_events():
             payload = {"ts": dt.datetime.now(tz=dt.timezone.utc).isoformat()}
 
             # ── 1. token-level streaming ──────────────────────────────────
