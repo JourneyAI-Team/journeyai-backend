@@ -1,4 +1,4 @@
-from agents import Agent
+from agents import Agent, WebSearchTool
 
 from app.models.assistant import Assistant
 from app.schemas.agent_context import AgentContext
@@ -11,6 +11,7 @@ def get_agent_from_assistant(assistant: Assistant) -> Agent:
         name=assistant.name,
         model=assistant.model,
         tools=[
+            WebSearchTool(),
             save_artifact,
         ],
         instructions=assistant.developer_prompt,  # TODO Support dynamic instructions such as pulling Artifact context
