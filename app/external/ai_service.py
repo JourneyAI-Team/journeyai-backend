@@ -114,6 +114,7 @@ async def generate_response(
     organization_id: str,
     account_id: str,
     session_id: str,
+    history: list[Message],
 ):
     """
     Generate a response using the specified agent and input.
@@ -132,6 +133,8 @@ async def generate_response(
         The account ID associated with the response.
     session_id : str
         The session ID associated with the response.
+    history : list[Message]
+        The history of messages associated with the response.
 
     Returns
     -------
@@ -148,7 +151,11 @@ async def generate_response(
     session = await Session.get(session_id)
 
     agent_context = AgentContext(
-        user=user, organization=organization, account=account, session=session
+        user=user,
+        organization=organization,
+        account=account,
+        session=session,
+        history=history,
     )
 
     logger.info(f"Generating response using agent: {agent.name}")
