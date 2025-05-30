@@ -1,3 +1,6 @@
+import json
+import pprint
+
 from agents import Agent, RunContextWrapper, WebSearchTool
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, Match
@@ -46,13 +49,37 @@ async def generate_instruction_context(messages: list[Message]) -> dict:
         for result in related_artifacts
     ]
 
+    logger.debug(f"Related artifacts: {pprint.pformat(related_artifacts_content)}")
+
     return {"artifacts": related_artifacts_content}
 
 
 async def create_instructions(
     wrapper: RunContextWrapper[AgentContext], assistant: Assistant
 ) -> str:
-    return assistant.developer_prompt
+
+    if len(wrapper.context.history) > 2:
+
+        instructions_context = await generate_instruction_context(
+            wrapper.context.history
+        )
+
+        instructions = (
+            assistant.developer_prompt
+            + "\n\n"
+            + f"""Below is additional context that you will be utilizing in order to give out the best responses and decisions possible.
+
+```json
+{json.dumps(instructions_context, indent=2)}
+```
+"""
+        )
+
+    instructions = assistant.developer_prompt
+
+    logger.debug(f"Instructions: {instructions}")
+
+    return instructions
 
 
 def get_agent_from_assistant(assistant: Assistant) -> Agent:
