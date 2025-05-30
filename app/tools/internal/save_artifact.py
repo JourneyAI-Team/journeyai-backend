@@ -7,16 +7,23 @@ from app.models.artifact import Artifact
 from app.schemas.types import OriginType
 
 
-# TODO: provide a proper description
 @function_tool
-async def save_artifact(
-    artifact_type: str, title: str, body: str, origin_type: OriginType = "llm"
-):
-    """ """
+async def save_artifact(artifact_type: str, title: str, body: str):
+    """Save an artifact to your memory. Think of artifacts as notes or highlights from
+    the conversation you are having with the user. It is highly recommended to frequently
+    take notes to enrich your memory.
+
+    Args:
+        artifact_type: The type of artifact to save. It should be a programmatic string
+            that describes the type of artifact. (e.g., "person", "location", etc.)
+        title: The title of the artifact.
+        body: The body of the artifact.
+    """
+
     arq = await get_arq()
 
     new_artifact = Artifact(
-        type=artifact_type, title=title, body=body, origin_type=origin_type
+        type=artifact_type, title=title, body=body, origin_type=OriginType.LLM
     )
     await new_artifact.insert()
     await arq.enqueue_job(
