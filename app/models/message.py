@@ -1,7 +1,6 @@
 import datetime as dt
 import uuid
 
-from agents import RunItem
 from beanie import Document
 from pydantic import Field
 
@@ -12,7 +11,7 @@ from app.schemas.types import SenderType
 class Message(Document):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
 
-    output: RunItem | None = None
+    output: dict | None = None
     input: InputMessageSchema | None = None
     sender: SenderType
 
