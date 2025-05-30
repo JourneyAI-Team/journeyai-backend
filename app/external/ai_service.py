@@ -5,6 +5,11 @@ from loguru import logger
 from openai.types.responses.response_input_item_param import ResponseInputItemParam
 
 from app.clients.openai_client import get_openai_async_client
+from app.models.account import Account
+from app.models.organization import Organization
+from app.models.session import Session
+from app.models.user import User
+from app.schemas.agent_context import AgentContext
 
 
 async def get_embeddings(embedding_input: str) -> List[float]:
@@ -39,7 +44,14 @@ async def get_embeddings(embedding_input: str) -> List[float]:
         raise
 
 
-async def generate_response(agent: Agent, input: list[ResponseInputItemParam]):
+async def generate_response(
+    agent: Agent,
+    input: list[ResponseInputItemParam],
+    user_id: str,
+    organization_id: str,
+    account_id: str,
+    session_id: str,
+):
     """
     Generate a response using the specified agent and input.
 
@@ -49,6 +61,14 @@ async def generate_response(agent: Agent, input: list[ResponseInputItemParam]):
         The agent instance used to generate the response.
     input : list[ResponseInputItemParam]
         A list of input parameters for the response generation.
+    user_id : str
+        The user ID associated with the response.
+    organization_id : str
+        The organization ID associated with the response.
+    account_id : str
+        The account ID associated with the response.
+    session_id : str
+        The session ID associated with the response.
 
     Yields
     ------
@@ -56,8 +76,17 @@ async def generate_response(agent: Agent, input: list[ResponseInputItemParam]):
         An event from the result stream of the response generation process.
     """
 
+    user = await User.get(user_id)
+    organization = await Organization.get(organization_id)
+    account = await Account.get(account_id)
+    session = await Session.get(session_id)
+
+    agent_context = AgentContext(
+        user=user, organization=organization, account=account, session=session
+    )
+
     logger.info(f"Generating response using agent: {agent.name}")
-    result = Runner.run_streamed(agent, input=input)
+    result = Runner.run_streamed(agent, input=input, context=agent_context)
 
     async for event in result.stream_events():
         yield event
