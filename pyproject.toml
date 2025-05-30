@@ -26,6 +26,7 @@ uvicorn = {extras = ["standard"], version = "^0.34.2"}
 qdrant-client = "^1.14.2"
 honcho = "^2.0.0"
 arq = "^0.26.3"
+groq = "^0.26.0"
 
 [build-system]
 requires = ["poetry-core"]
