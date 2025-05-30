@@ -1,14 +1,17 @@
 from typing import Callable
 
-from agents import function_tool
+from agents import RunContextWrapper, function_tool
 
 from app.clients.arq_client import get_arq
 from app.models.artifact import Artifact
+from app.schemas.agent_context import AgentContext
 from app.schemas.types import OriginType
 
 
 @function_tool
-async def save_artifact(artifact_type: str, title: str, body: str):
+async def save_artifact(
+    wrapper: RunContextWrapper[AgentContext], artifact_type: str, title: str, body: str
+):
     """Save an artifact to your memory. Think of artifacts as notes or highlights from
     the conversation you are having with the user. It is highly recommended to frequently
     take notes to enrich your memory.
@@ -23,7 +26,14 @@ async def save_artifact(artifact_type: str, title: str, body: str):
     arq = await get_arq()
 
     new_artifact = Artifact(
-        type=artifact_type, title=title, body=body, origin_type=OriginType.LLM
+        type=artifact_type,
+        title=title,
+        body=body,
+        origin_type=OriginType.LLM,
+        user_id=wrapper.context.user.id,
+        organization_id=wrapper.context.organization.id,
+        account_id=wrapper.context.account.id,
+        session_id=wrapper.context.session.id,
     )
     await new_artifact.insert()
     await arq.enqueue_job(
