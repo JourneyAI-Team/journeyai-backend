@@ -66,7 +66,7 @@ async def search_vectors(
     try:
         response = await client.search(
             collection_name=collection_name,
-            vector=query_embedding,
+            query_vector=query_embedding,
             limit=top_k,
             filter=filter,
         )
