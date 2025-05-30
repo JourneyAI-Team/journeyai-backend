@@ -1,5 +1,6 @@
-from agents import Agent, WebSearchTool
+from agents import Agent, RunContextWrapper, WebSearchTool
 from loguru import logger
+from qdrant_client.models import FieldCondition, Filter, Match
 
 from app.external.ai_service import create_summary_for_search, get_embeddings
 from app.models.assistant import Assistant
