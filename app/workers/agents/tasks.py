@@ -209,6 +209,7 @@ async def process_session(ctx, connection_id: str, session_id: str):
             session.organization_id,
             session.account_id,
             session_id,
+            assistant=assistant,
             history=messages,
         )
 

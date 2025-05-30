@@ -54,9 +54,9 @@ async def generate_instruction_context(messages: list[Message]) -> dict:
     return {"artifacts": related_artifacts_content}
 
 
-async def create_instructions(
-    wrapper: RunContextWrapper[AgentContext], assistant: Assistant
-) -> str:
+async def create_instructions(wrapper: RunContextWrapper[AgentContext]) -> str:
+
+    assistant = wrapper.context.assistant
 
     if len(wrapper.context.history) > 2:
 

@@ -9,6 +9,7 @@ from app.clients.groq_client import get_groq_async_client
 from app.clients.openai_client import get_openai_async_client
 from app.core.config import settings
 from app.models.account import Account
+from app.models.assistant import Assistant
 from app.models.message import Message
 from app.models.organization import Organization
 from app.models.session import Session
@@ -114,6 +115,7 @@ async def generate_response(
     organization_id: str,
     account_id: str,
     session_id: str,
+    assistant: Assistant,
     history: list[Message],
 ):
     """
@@ -156,6 +158,7 @@ async def generate_response(
         account=account,
         session=session,
         history=history,
+        assistant=assistant,
     )
 
     logger.info(f"Generating response using agent: {agent.name}")
