@@ -105,6 +105,9 @@ async def generate_response(
         The result of the response generation process.
     """
 
+    if not settings.OPENAI_API_KEY:
+        raise ValueError("No OpenAI API key provided. Cannot use any LLM service.")
+
     user = await User.get(user_id)
     organization = await Organization.get(organization_id)
     account = await Account.get(account_id)
