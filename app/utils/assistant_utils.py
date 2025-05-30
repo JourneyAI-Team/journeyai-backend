@@ -48,6 +48,12 @@ async def generate_instruction_context(messages: list[Message]) -> dict:
     return {"artifacts": related_artifacts_content}
 
 
+async def create_instructions(
+    wrapper: RunContextWrapper[AgentContext], assistant: Assistant
+) -> str:
+    return assistant.developer_prompt
+
+
 def get_agent_from_assistant(assistant: Assistant) -> Agent:
 
     # Retrieve tools
@@ -63,5 +69,5 @@ def get_agent_from_assistant(assistant: Assistant) -> Agent:
         name=assistant.name,
         model=assistant.model,
         tools=tools,
-        instructions=assistant.developer_prompt,  # TODO Support dynamic instructions such as pulling Artifact context
+        instructions=create_instructions,
     )
