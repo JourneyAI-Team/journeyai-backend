@@ -16,7 +16,7 @@ from app.models.user import User
 from app.schemas.agent_context import AgentContext
 
 
-async def create_summary(messages: list[Message]) -> str:
+async def create_summary_for_search(messages: list[Message]) -> str:
     """
     Summarize the list of provided messages.
 
@@ -35,7 +35,7 @@ async def create_summary(messages: list[Message]) -> str:
     llm_input = [
         {
             "role": "user",
-            "content": "I will provide you a long string that came straight from my database. These are exchanges between a user and a assistant. Using this, I want you to give me a summary and only the summary (no other words like 'Sure let me...') of the entire conversation. The summary should be detailed enough to be useful for a human to understand the conversation but not long enough for you to take forever to generate.",
+            "content": "I will provide you a long string that came straight from my database. These are exchanges between a user and a assistant. Using this, I want you to give me a summary and only the summary (no other words like 'Sure let me...') of the entire conversation. The summary should be detailed enough to be useful for a human to understand the conversation but not long enough for you to take forever to generate.\n\nThe goal of this summary is to pass it onto a embedding search function that will go ahead and find messages, documents, etc related to it. So ensure that you structure your output to be optimized for that specific use case.",
         },
         {
             "role": "user",
