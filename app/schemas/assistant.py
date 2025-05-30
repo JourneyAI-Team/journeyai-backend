@@ -21,7 +21,7 @@ class AssistantBase(BaseModel):
                 "type": ToolType.INTERNAL,
             },
             {
-                "name": "web_search",
+                "name": "openai_web_search",
                 "type": ToolType.EXTERNAL,
             },
         ]
