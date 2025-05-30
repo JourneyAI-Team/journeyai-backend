@@ -72,7 +72,7 @@ async def create_session(
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error creating session.",
-            )
+            ) from e
         return new_session
 
 
@@ -93,7 +93,7 @@ async def list_sessions(
         organization_id=current_user.organization_id,
         account_id=account_id,
     ):
-        logger.info(f"List sessions request received.")
+        logger.info("List sessions request received.")
 
         # Check if account exists
         account = await Account.find_one(
@@ -114,7 +114,7 @@ async def list_sessions(
                 Session.account_id == account.id,
                 Session.organization_id == current_user.organization_id,
             )
-            .sort(-Session.created_at)
+            .sort("-created_at")
             .to_list()
         )
 
@@ -199,7 +199,7 @@ async def update_session(
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error updating session.",
-            )
+            ) from e
         return session
 
 
@@ -243,4 +243,4 @@ async def delete_session(
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error deleting session.",
-            )
+            ) from e
