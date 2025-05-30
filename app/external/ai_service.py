@@ -1,3 +1,4 @@
+import pprint
 from typing import List
 
 from agents import Agent, Runner
@@ -30,10 +31,37 @@ async def create_summary(messages: list[Message]) -> str:
         The summary of the list of messages.
     """
 
+    messages_input = pprint.pformat(messages)
+    llm_input = [
+        {
+            "role": "user",
+            "content": "I will provide you a long string that came straight from my database. These are exchanges between a user and a assistant. Using this, I want you to give me a summary and only the summary (no other words like 'Sure let me...') of the entire conversation. The summary should be detailed enough to be useful for a human to understand the conversation but not long enough for you to take forever to generate.",
+        },
+        {
+            "role": "user",
+            "content": messages_input,
+        },
+    ]
+
     if settings.GROQ_API_KEY:
         client = get_groq_async_client()
+
+        chat_completion = await client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=llm_input,
+        )
+
+        return chat_completion.choices[0].message.content
+
     elif settings.OPENAI_API_KEY:
         client = get_openai_async_client()
+
+        response = await client.responses.create(
+            input=llm_input, model="chatgpt-4o-latest"
+        )
+
+        return response.output_text
+
     else:
         raise ValueError("No LLM provider configured. Cannot use any LLM service.")
 
