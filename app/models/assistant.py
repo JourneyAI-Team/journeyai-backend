@@ -3,6 +3,18 @@ import uuid
 
 from beanie import Document
 from pydantic import Field
+from typing_extensions import TypedDict
+
+from app.schemas.types import ToolType
+
+
+class AssistantTool(TypedDict):
+    name: str
+    type: ToolType
+
+
+class AssistantToolConfig(TypedDict):
+    tools: list[AssistantTool]
 
 
 class Assistant(Document):
@@ -12,7 +24,7 @@ class Assistant(Document):
     internal_name: str
     description: str
 
-    tool_config: dict[str, str] = Field(default_factory=dict)
+    tool_config: AssistantToolConfig = Field(default_factory=AssistantToolConfig)
     testing: bool = False
     version: str = "0.0.1"
 
