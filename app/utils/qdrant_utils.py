@@ -68,7 +68,7 @@ async def search_vectors(
             collection_name=collection_name,
             query_vector=query_embedding,
             limit=top_k,
-            filter=filter,
+            query_filter=filter,
         )
         return response
     except Exception as e:
