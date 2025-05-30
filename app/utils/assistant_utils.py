@@ -54,7 +54,9 @@ async def generate_instruction_context(messages: list[Message]) -> dict:
     return {"artifacts": related_artifacts_content}
 
 
-async def create_instructions(wrapper: RunContextWrapper[AgentContext]) -> str:
+async def create_instructions(
+    wrapper: RunContextWrapper[AgentContext], agent: Agent[AgentContext]
+) -> str:
 
     assistant = wrapper.context.assistant
 
