@@ -4,12 +4,38 @@ from agents import Agent, Runner
 from loguru import logger
 from openai.types.responses.response_input_item_param import ResponseInputItemParam
 
+from app.clients.groq_client import get_groq_async_client
 from app.clients.openai_client import get_openai_async_client
+from app.core.config import settings
 from app.models.account import Account
+from app.models.message import Message
 from app.models.organization import Organization
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.agent_context import AgentContext
+
+
+async def create_summary(messages: list[Message]) -> str:
+    """
+    Summarize the list of provided messages.
+
+    Parameters
+    ----------
+    messages : list[Message]
+        The list of messages to summarize.
+
+    Returns
+    -------
+    summary : str
+        The summary of the list of messages.
+    """
+
+    if settings.GROQ_API_KEY:
+        client = get_groq_async_client()
+    elif settings.OPENAI_API_KEY:
+        client = get_openai_async_client()
+    else:
+        raise ValueError("No LLM provider configured. Cannot use any LLM service.")
 
 
 async def get_embeddings(embedding_input: str) -> List[float]:
