@@ -7,6 +7,8 @@ from loguru import logger
 from openai.types.responses.response_text_delta_event import ResponseTextDeltaEvent
 
 from app.external.ai_service import generate_response
+from app.models.message import Message
+from app.schemas.types import SenderType
 from app.utils.assistant_utils import get_agent_from_assistant
 from app.utils.websocket.communications import send_to_websocket
 from app.workers.agents.utils import (
@@ -209,4 +211,19 @@ async def process_session(ctx, connection_id: str, session_id: str):
             session_id,
         )
 
+        # Stream events to the websocket for real time support
         await emit_stream_events(connection_id, result, session_id)
+
+        # Save the response to the database
+        new_items = [item.to_input_item() for item in result.new_items]
+        for new_item in new_items:
+            new_message = Message(
+                output=new_item,
+                sender=SenderType.ASSISTANT,
+                user_id=session.user_id,
+                organization_id=session.organization_id,
+                session_id=session_id,
+                account_id=session.account_id,
+                assistant_id=assistant.id,
+            )
+            await new_message.save()
