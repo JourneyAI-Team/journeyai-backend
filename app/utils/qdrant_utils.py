@@ -1,5 +1,5 @@
 from loguru import logger
-from qdrant_client.models import PointStruct, ScoredPoint
+from qdrant_client.models import Filter, PointStruct, ScoredPoint
 
 from app.clients.qdrant_client import get_async_qdrant_client
 
@@ -37,7 +37,10 @@ async def insert_vector(
 
 
 async def search_vectors(
-    collection_name: str, query_embedding: list[float], top_k: int
+    collection_name: str,
+    query_embedding: list[float],
+    top_k: int,
+    filter: Filter | None = None,
 ) -> list[ScoredPoint]:
     """
     Search for vectors in a Qdrant collection.
@@ -50,6 +53,8 @@ async def search_vectors(
         The query vector to search for.
     top_k : int
         The number of top results to return.
+    filter : Filter | None
+        The filter to apply to the search.
 
     Returns
     -------
@@ -63,6 +68,7 @@ async def search_vectors(
             collection_name=collection_name,
             vector=query_embedding,
             limit=top_k,
+            filter=filter,
         )
         return response
     except Exception as e:

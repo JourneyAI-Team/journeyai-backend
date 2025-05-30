@@ -27,6 +27,14 @@ async def generate_instruction_context(messages: list[Message]) -> dict:
         collection_name="Artifacts",
         query_embedding=search_query_embedding,
         top_k=10,
+        filter=Filter(
+            must=[
+                FieldCondition(
+                    key="account_id",
+                    match=Match(value=messages[0].account_id),
+                )
+            ]
+        ),
     )
     related_artifacts_content = [
         {
