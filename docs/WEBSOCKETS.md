@@ -1,6 +1,34 @@
-# WebSocket Event Documentation
+# WebSocket API Documentation
 
-This document outlines the various event types and data formats used for WebSocket communication in the application.
+This document provides a detailed guide on using the WebSocket API for real-time communication in the application. It includes information on how to connect, the types of events you can send and receive, and the data formats for each event type.
+
+## Connecting to the WebSocket
+
+To establish a WebSocket connection, use the following endpoint:
+
+```
+ws://<your-server-url>/ws/main
+```
+
+### Authentication
+
+The WebSocket connection requires authentication. You must provide a valid API key obtained during the login process. The API key is used to authenticate the user and establish a secure connection.
+
+## Base Message Format
+
+All messages sent and received via the WebSocket follow a standard JSON format. The base structure is as follows:
+
+```json
+{
+  "event": "<event_name>",
+  "data": {
+    // Event-specific data
+  }
+}
+```
+
+- **`event`**: A string representing the name of the event.
+- **`data`**: A JSON object containing event-specific data.
 
 ## Event Types and Data Formats
 
@@ -8,6 +36,7 @@ This document outlines the various event types and data formats used for WebSock
 
 - **Event Name:** `connection_established`
 - **Data Format:**
+
   ```json
   {
     "connection_id": "<str>",
@@ -20,6 +49,7 @@ This document outlines the various event types and data formats used for WebSock
 
 - **Event Name:** `error`
 - **Data Format:**
+
   ```json
   {
     "message": "<str>"
@@ -28,9 +58,13 @@ This document outlines the various event types and data formats used for WebSock
 
 ### 3. Agent Response Events
 
+These events are related to the agent's responses and actions.
+
 - **Event Name:** `agent_response`
 - **Data Formats:**
+
   - **Token-level Streaming:**
+
     ```json
     {
       "kind": "token",
@@ -38,7 +72,9 @@ This document outlines the various event types and data formats used for WebSock
       "ts": "<ISO 8601 timestamp>"
     }
     ```
+
   - **Agent Switch Notifications:**
+
     ```json
     {
       "kind": "agent_switch",
@@ -46,7 +82,9 @@ This document outlines the various event types and data formats used for WebSock
       "ts": "<ISO 8601 timestamp>"
     }
     ```
+
   - **Message Output Created:**
+
     ```json
     {
       "kind": "message",
@@ -58,7 +96,9 @@ This document outlines the various event types and data formats used for WebSock
       "ts": "<ISO 8601 timestamp>"
     }
     ```
+
   - **Tool Called:**
+
     ```json
     {
       "kind": "tool_call",
@@ -70,8 +110,10 @@ This document outlines the various event types and data formats used for WebSock
       "ts": "<ISO 8601 timestamp>"
     }
     ```
+
   - **Tool Output:**
-     ```json
+
+    ```json
     {
       "kind": "tool_output",
       "tool": {
@@ -82,7 +124,10 @@ This document outlines the various event types and data formats used for WebSock
       },
       "ts": "<ISO 8601 timestamp>"
     }
+    ```
+
   - **Handoff Requested:**
+
     ```json
     {
       "kind": "handoff",
@@ -92,7 +137,9 @@ This document outlines the various event types and data formats used for WebSock
       "ts": "<ISO 8601 timestamp>"
     }
     ```
+
   - **Handoff Occurred:**
+
     ```json
     {
       "kind": "handoff",
@@ -102,7 +149,9 @@ This document outlines the various event types and data formats used for WebSock
       "ts": "<ISO 8601 timestamp>"
     }
     ```
+
   - **Done Marker:**
+
     ```json
     {
       "kind": "done",
@@ -115,6 +164,7 @@ This document outlines the various event types and data formats used for WebSock
 
 - **Event Name:** `<dynamic_event_name>`
 - **Data Format:**
+
   ```json
   {
     "event": "<str>",
@@ -126,6 +176,7 @@ This document outlines the various event types and data formats used for WebSock
 
 - **Event Name:** `ingest_message`
 - **Data Format:**
+
   ```json
   {
     "content": "<str>",
@@ -135,6 +186,20 @@ This document outlines the various event types and data formats used for WebSock
     "session_id": "<str>"
   }
   ```
+
+## Example Usage
+
+### Establishing a Connection
+
+To establish a connection, use a WebSocket client to connect to the endpoint and authenticate using your API key.
+
+### Sending a Message
+
+To send a message, format your data according to the event type and send it through the WebSocket connection using the base message format.
+
+### Receiving Messages
+
+Listen for incoming messages on the WebSocket connection. The server will send messages in the formats described above.
 
 ## Notes
 
