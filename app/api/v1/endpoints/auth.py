@@ -12,7 +12,7 @@ from app.core.security import create_access_token, get_password_hash, verify_pas
 from app.models.organization import Organization
 from app.models.user import User
 from app.schemas.token import Token
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import UserApiKey, UserCreate, UserRead
 
 router = APIRouter()
 
@@ -139,3 +139,13 @@ async def register(user_in: UserCreate) -> Any:
 )
 async def get_me(current_user: User = Depends(get_current_user)) -> Any:
     return current_user
+
+
+@router.get(
+    "/api-key",
+    response_model=UserApiKey,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the currently authenticated user's API key.",
+)
+async def get_api_key(current_user: User = Depends(get_current_user)) -> UserApiKey:
+    return UserApiKey(api_key=current_user.access_token)
