@@ -48,3 +48,11 @@ class UserRead(UserBase):
     email: EmailStr
     role: str
     organization_id: str | None = None
+
+
+class UserApiKey(BaseModel):
+    """
+    Schema for user API key
+    """
+
+    api_key: str
