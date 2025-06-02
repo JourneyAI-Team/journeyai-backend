@@ -36,7 +36,7 @@ async def create_summary_for_search(messages: list[Message]) -> str:
     llm_input = [
         {
             "role": "user",
-            "content": "I will provide you a long string that came straight from my database. These are exchanges between a user and a assistant. Using this, I want you to give me a summary and only the summary (no other words like 'Sure let me...') of the entire conversation. The summary should be detailed enough to be useful for a human to understand the conversation but not long enough for you to take forever to generate.\n\nThe goal of this summary is to pass it onto a embedding search function that will go ahead and find messages, documents, etc related to it. So ensure that you structure your output to be optimized for that specific use case.",
+            "content": "You are an LLM agent that receives a large conversation dump in JSON format. Your task is to analyze the conversation and generate a concise search query string that represents the main topics, ideas, and keywords discussed in the conversation. The search query should be optimized for finding similar conversations using embeddings, and should include key topics, important entities, and core questions or themes from the discussion. Do not summarize the conversation—focus on extracting a relevant and precise search query.",
         },
         {
             "role": "user",
