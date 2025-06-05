@@ -1,4 +1,8 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
+
+from app.schemas.profile import ProfileCreate, ProfileRead
 
 
 class UserBase(BaseModel):
@@ -21,11 +25,14 @@ class UserCreate(UserBase):
         User's plain text password that will be hashed
     organization_id : str, optional
         ID of the organization the user belongs to
+    profile : ProfileCreate, optional
+        User's profile information
     """
 
     email: EmailStr
     password: str
     organization_id: str | None = None
+    profile: Optional[ProfileCreate] = None
 
 
 class UserRead(UserBase):
@@ -42,12 +49,15 @@ class UserRead(UserBase):
         User's role in the system
     organization_id : str, optional
         ID of the organization the user belongs to
+    profile : ProfileRead
+        User's profile information
     """
 
     id: str
     email: EmailStr
     role: str
     organization_id: str | None = None
+    profile: ProfileRead
 
 
 class UserApiKey(BaseModel):
