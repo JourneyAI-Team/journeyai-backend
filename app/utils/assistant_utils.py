@@ -11,7 +11,7 @@ from app.models.assistant import Assistant
 from app.models.message import Message
 from app.models.organization import Organization
 from app.models.session import Session
-from app.models.user import User
+from app.models.user import Profile, User
 from app.schemas.agent_context import AgentContext
 from app.schemas.types import SenderType
 from app.utils.qdrant_utils import search_vectors
@@ -30,6 +30,7 @@ async def generate_instruction_context(
     Generate context that will be passed onto the LLM. Context includes:
     - Artifacts related to the current conversation.
     - Messages (either from this or another session) that may or may not be related to the current conversation.
+    - User profile information for personalization.
     """
 
     with logger.contextualize(
@@ -87,10 +88,15 @@ async def generate_instruction_context(
         related_messages_content = parse_related_messages(related_messages)
         logger.debug(f"Related messages: {pprint.pformat(related_messages_content)}")
 
+        # Parse user profile information
+        user_profile = parse_user_profile(user.profile)
+        logger.debug(f"User profile: {pprint.pformat(user_profile)}")
+
         logger.info("Generated instructions context.")
         return {
             "artifacts": related_artifacts_content,
             "messages": related_messages_content,
+            "user_profile": user_profile,
         }
 
 
@@ -100,35 +106,39 @@ async def create_instructions(
 
     assistant = wrapper.context.assistant
 
-    if len(wrapper.context.history) > 2:
+    instructions_context = await generate_instruction_context(
+        wrapper.context.history,
+        wrapper.context.user,
+        wrapper.context.organization,
+        wrapper.context.account,
+        wrapper.context.session,
+        wrapper.context.assistant,
+    )
 
-        instructions_context = await generate_instruction_context(
-            wrapper.context.history,
-            wrapper.context.user,
-            wrapper.context.organization,
-            wrapper.context.account,
-            wrapper.context.session,
-            wrapper.context.assistant,
-        )
+    instructions = (
+        assistant.developer_prompt
+        + "\n\n"
+        + f"""## Additional Context
+Below is additional context that you will be utilizing in order to give out the best responses and make the best decisions possible. Provided are artifacts and messages that may be related to the current conversation, as well as user profile information for personalization.
 
-        instructions = (
-            assistant.developer_prompt
-            + "\n\n"
-            + f"""## Additional Context
-Below is additional context that you will be utilizing in order to give out the best responses and make the best decisions possible. Provided are artifacts and messages that may be related to the current conversation.
+### User Profile
+Use the user profile information to personalize your responses, understand the user's context, preferences, and communication style. This information can help you:
+- Tailor your communication style to match the user's preferences
+- Reference their interests, goals, and background when relevant
+- Provide more relevant and contextual assistance
+- Build rapport and maintain continuity in conversations
+
+### Account Information
+Some basic information about the account you are working under:
+- Name: {wrapper.context.account.name}
+- Description: {wrapper.context.account.description}
+
+### Context Data
 ```json
 {json.dumps(instructions_context, indent=2)}
 ```
 """
-        )
-    else:
-        instructions = assistant.developer_prompt
-
-    instructions += f"""\n\n## Account Information
-Some basic information about the account you are working under:
-- Name: {wrapper.context.account.name}
-- Description: {wrapper.context.account.description}
-"""
+    )
 
     logger.debug(f"Instructions: {instructions}")
     logger.info("Created instructions.")
@@ -175,3 +185,28 @@ def parse_related_messages(messages: list[dict]) -> list[dict]:
         related_messages.append(data)
 
     return related_messages
+
+
+def parse_user_profile(profile: Profile) -> dict:
+    """
+    Parse user profile information into a clean dictionary format.
+    Only includes fields that have values to avoid cluttering the context.
+
+    Parameters
+    ----------
+    profile : Profile
+        User profile object
+
+    Returns
+    -------
+    dict
+        Clean dictionary containing only populated profile fields
+    """
+
+    # Convert profile to dict and filter out None/empty values
+    profile_dict = (
+        profile.model_dump() if hasattr(profile, "model_dump") else profile.__dict__
+    )
+    return {
+        k: v for k, v in profile_dict.items() if v is not None and v != [] and v != {}
+    }
