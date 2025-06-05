@@ -114,11 +114,16 @@ async def create_instructions(
         instructions = (
             assistant.developer_prompt
             + "\n\n"
-            + f"""Below is additional context that you will be utilizing in order to give out the best responses and make the best decisions possible.
-
+            + f"""## Additional Context
+Below is additional context that you will be utilizing in order to give out the best responses and make the best decisions possible. Provided are artifacts and messages that may be related to the current conversation.
 ```json
 {json.dumps(instructions_context, indent=2)}
 ```
+
+## Account Information
+Some basic information about the account you are working under:
+- Name: {wrapper.context.account.name}
+- Description: {wrapper.context.account.description}
 """
         )
 
