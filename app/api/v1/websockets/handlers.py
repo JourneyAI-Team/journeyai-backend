@@ -34,6 +34,11 @@ async def ingest_message(connection_id: str, user: User, data: InputMessageSchem
             embed_after_insert=True,
         )
         await new_message.insert()
+        await arq.enqueue_job(
+            "post_message_creation",
+            new_message.id,
+            _queue_name="messages",
+        )
 
         with logger.contextualize(message_id=new_message.id):
             logger.info("Message saved. Sending message to agents worker...")

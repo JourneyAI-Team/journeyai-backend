@@ -176,6 +176,9 @@ async def process_session(ctx, connection_id: str, session_id: str):
     session_id : str
         The session ID for the current session.
     """
+
+    arq = ctx["arq"]
+
     await send_to_websocket(
         connection_id, "processing_session", {"session_id": session_id}
     )
@@ -230,3 +233,9 @@ async def process_session(ctx, connection_id: str, session_id: str):
                 embed_after_insert=True,
             )
             await new_message.save()
+
+            await arq.enqueue_job(
+                "post_message_creation",
+                new_message.id,
+                _queue_name="messages",
+            )
