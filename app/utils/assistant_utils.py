@@ -167,7 +167,7 @@ def parse_related_messages(messages: list[dict]) -> list[dict]:
             "sender": message.payload["sender"],
         }
 
-        if message.sender == SenderType.USER:
+        if data["sender"] == SenderType.USER.value:
             data["content"] = message.payload["input"]["content"]
         else:
             data["content"] = message.payload["output"]
