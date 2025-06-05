@@ -6,52 +6,92 @@ from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from app.external.ai_service import create_summary_for_search, get_embeddings
+from app.models.account import Account
 from app.models.assistant import Assistant
 from app.models.message import Message
+from app.models.organization import Organization
+from app.models.session import Session
+from app.models.user import User
 from app.schemas.agent_context import AgentContext
+from app.schemas.types import SenderType
 from app.utils.qdrant_utils import search_vectors
 from app.utils.tool_utils import get_tool
 
 
-async def generate_instruction_context(messages: list[Message]) -> dict:
+async def generate_instruction_context(
+    messages: list[Message],
+    user: User,
+    organization: Organization,
+    account: Account,
+    session: Session,
+    assistant: Assistant,
+) -> dict:
     """
     Generate context that will be passed onto the LLM. Context includes:
     - Artifacts related to the current conversation.
     - Messages (either from this or another session) that may or may not be related to the current conversation.
     """
 
-    logger.info("Generating instruction context")
-    search_query = await create_summary_for_search(messages)
-    logger.info(f"Search query: {search_query}")
+    with logger.contextualize(
+        user_id=user.id,
+        organization_id=organization.id,
+        account_id=account.id,
+        session_id=session.id,
+        assistant_id=assistant.id,
+        message_id=messages[-1].id,
+    ):
 
-    search_query_embedding = await get_embeddings(search_query)
+        logger.debug("Generating instructions context...")
+        search_query = await create_summary_for_search(messages)
+        logger.info(f"Search query: {search_query}")
 
-    # Fetch related artifacts
-    related_artifacts = await search_vectors(
-        collection_name="Artifacts",
-        query_embedding=search_query_embedding,
-        top_k=10,
-        filter=Filter(
-            must=[
-                FieldCondition(
-                    key="account_id",
-                    match=MatchValue(value=messages[0].account_id),
-                )
-            ]
-        ),
-    )
-    related_artifacts_content = [
-        {
-            "id": result.id,
-            "title": result.payload["title"],
-            "body": result.payload["body"],
+        search_query_embedding = await get_embeddings(search_query)
+
+        # Fetch related artifacts
+        related_artifacts = await search_vectors(
+            collection_name="Artifacts",
+            query_embedding=search_query_embedding,
+            top_k=10,
+            filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="account_id",
+                        match=MatchValue(value=account.id),
+                    )
+                ]
+            ),
+        )
+        related_artifacts_content = [
+            {
+                "id": result.id,
+                "title": result.payload["title"],
+                "body": result.payload["body"],
+            }
+            for result in related_artifacts
+        ]
+        logger.debug(f"Related artifacts: {pprint.pformat(related_artifacts_content)}")
+
+        # Fetch related messages
+        related_messages = await search_vectors(
+            collection_name="Messages",
+            query_embedding=search_query_embedding,
+            top_k=20,
+            filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="account_id", match=MatchValue(value=account.id)
+                    ),
+                ]
+            ),
+        )
+        related_messages_content = parse_related_messages(related_messages)
+        logger.debug(f"Related messages: {pprint.pformat(related_messages_content)}")
+
+        logger.info("Generated instructions context.")
+        return {
+            "artifacts": related_artifacts_content,
+            "messages": related_messages_content,
         }
-        for result in related_artifacts
-    ]
-
-    logger.debug(f"Related artifacts: {pprint.pformat(related_artifacts_content)}")
-
-    return {"artifacts": related_artifacts_content}
 
 
 async def create_instructions(
@@ -63,23 +103,35 @@ async def create_instructions(
     if len(wrapper.context.history) > 2:
 
         instructions_context = await generate_instruction_context(
-            wrapper.context.history
+            wrapper.context.history,
+            wrapper.context.user,
+            wrapper.context.organization,
+            wrapper.context.account,
+            wrapper.context.session,
+            wrapper.context.assistant,
         )
 
         instructions = (
             assistant.developer_prompt
             + "\n\n"
-            + f"""Below is additional context that you will be utilizing in order to give out the best responses and decisions possible.
-
+            + f"""## Additional Context
+Below is additional context that you will be utilizing in order to give out the best responses and make the best decisions possible. Provided are artifacts and messages that may be related to the current conversation.
 ```json
 {json.dumps(instructions_context, indent=2)}
 ```
 """
         )
+    else:
+        instructions = assistant.developer_prompt
 
-    instructions = assistant.developer_prompt
+    instructions += f"""\n\n## Account Information
+Some basic information about the account you are working under:
+- Name: {wrapper.context.account.name}
+- Description: {wrapper.context.account.description}
+"""
 
     logger.debug(f"Instructions: {instructions}")
+    logger.info("Created instructions.")
 
     return instructions
 
@@ -101,3 +153,25 @@ def get_agent_from_assistant(assistant: Assistant) -> Agent:
         tools=tools,
         instructions=create_instructions,
     )
+
+
+def parse_related_messages(messages: list[dict]) -> list[dict]:
+    """
+    Parse the related messages into a list of dictionaries.
+    """
+
+    related_messages = []
+    for message in messages:
+        data = {
+            "id": message.id,
+            "sender": message.payload["sender"],
+        }
+
+        if data["sender"] == SenderType.USER.value:
+            data["content"] = message.payload["input"]["content"]
+        else:
+            data["content"] = message.payload["output"]
+
+        related_messages.append(data)
+
+    return related_messages
