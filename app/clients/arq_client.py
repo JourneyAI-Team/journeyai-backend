@@ -27,3 +27,23 @@ async def get_arq() -> ArqRedis:
                 logger.success("Initialized ARQ Redis pool")
 
     return _arq_redis
+
+
+async def close_arq_pool():
+    """
+    Close the ARQ Redis pool and reset the global variable.
+
+    This function should be called during worker shutdown to properly
+    clean up Redis connections.
+    """
+    global _arq_redis
+
+    if _arq_redis is not None:
+        async with _lock:
+            if _arq_redis is not None:
+                try:
+                    await _arq_redis.close(close_connection_pool=True)
+                    _arq_redis = None
+                    logger.success("ARQ Redis pool closed successfully")
+                except Exception as e:
+                    logger.warning(f"Error closing ARQ Redis pool: {str(e)}")
