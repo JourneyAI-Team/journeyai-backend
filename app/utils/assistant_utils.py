@@ -119,15 +119,16 @@ Below is additional context that you will be utilizing in order to give out the 
 ```json
 {json.dumps(instructions_context, indent=2)}
 ```
+"""
+        )
+    else:
+        instructions = assistant.developer_prompt
 
-## Account Information
+    instructions += f"""\n\n## Account Information
 Some basic information about the account you are working under:
 - Name: {wrapper.context.account.name}
 - Description: {wrapper.context.account.description}
 """
-        )
-
-    instructions = assistant.developer_prompt
 
     logger.debug(f"Instructions: {instructions}")
 
