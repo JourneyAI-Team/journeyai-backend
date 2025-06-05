@@ -155,7 +155,7 @@ def get_agent_from_assistant(assistant: Assistant) -> Agent:
     )
 
 
-def parse_related_messages(messages: list[Message]) -> list[dict]:
+def parse_related_messages(messages: list[dict]) -> list[dict]:
     """
     Parse the related messages into a list of dictionaries.
     """
@@ -164,13 +164,13 @@ def parse_related_messages(messages: list[Message]) -> list[dict]:
     for message in messages:
         data = {
             "id": message.id,
-            "sender": message.sender,
+            "sender": message.payload["sender"],
         }
 
         if message.sender == SenderType.USER:
-            data["content"] = message.input["content"]
+            data["content"] = message.payload["input"]["content"]
         else:
-            data["content"] = message.output
+            data["content"] = message.payload["output"]
 
         related_messages.append(data)
 
