@@ -31,6 +31,7 @@ async def ingest_message(connection_id: str, user: User, data: InputMessageSchem
             session_id=data["session_id"],
             assistant_id=data["assistant_id"],
             account_id=data["account_id"],
+            embed_after_insert=True,
         )
         await new_message.insert()
 
