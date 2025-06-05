@@ -131,6 +131,7 @@ Some basic information about the account you are working under:
 """
 
     logger.debug(f"Instructions: {instructions}")
+    logger.info("Created instructions.")
 
     return instructions
 
