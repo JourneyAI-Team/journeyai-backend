@@ -36,7 +36,7 @@ User's Details:
     - Email: {user.email}
 Message Details:
     - ID: {message.id}
-    - Content: {message.content}
+    - Content: {message.input["content"]}
     - Created At: {format_datetime_to_string(message.created_at)}
 """
 
