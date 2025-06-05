@@ -19,6 +19,9 @@ class Message(Document):
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
     )
 
+    # Post Actions
+    embed_after_insert: bool = Field(default=True, exclude=True)
+
     # Relations
     user_id: str
     organization_id: str
