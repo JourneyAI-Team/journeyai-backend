@@ -3,10 +3,11 @@ from arq.connections import RedisSettings
 from app.clients.arq_client import get_arq
 from app.core.config import settings
 from app.core.starters import initialize_worker
+from app.workers.messages.tasks import post_message_creation
 
 # Worker Configuration
 NAME = "messages"
-FUNCTIONS = []
+FUNCTIONS = [post_message_creation]
 
 
 # Setup function
