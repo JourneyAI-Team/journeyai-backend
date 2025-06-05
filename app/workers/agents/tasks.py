@@ -227,5 +227,6 @@ async def process_session(ctx, connection_id: str, session_id: str):
                 session_id=session_id,
                 account_id=session.account_id,
                 assistant_id=assistant.id,
+                embed_after_insert=True,
             )
             await new_message.save()
