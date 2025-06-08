@@ -68,8 +68,6 @@ async def create_summary_for_search(messages: list[Message]) -> str:
     else:
         raise ValueError("No LLM provider configured. Cannot use any LLM service.")
 
-    logger.info(f"Summary for search: {summary}")
-
     return summary
 
 
