@@ -1,6 +1,12 @@
 import pprint
 
-from agents import Agent, FileSearchTool, RunContextWrapper, WebSearchTool
+from agents import (
+    Agent,
+    FileSearchTool,
+    ModelSettings,
+    RunContextWrapper,
+    WebSearchTool,
+)
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
@@ -40,6 +46,10 @@ class AssistantsManager:
             model=assistant.model,
             tools=tools,
             instructions=self.create_instructions,
+            model_settings=ModelSettings(
+                tool_choice="file_search",
+            ),
+            reset_tool_choice=True,
         )
 
     async def create_instructions(
