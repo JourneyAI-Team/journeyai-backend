@@ -20,11 +20,14 @@ class Artifact(Document):
     )
 
     # Relations
-    user_id: str
-    organization_id: str
+    user_id: str | None = None
+    organization_id: str | None = None
     session_id: str | None = None  # Exists if artifact is created from within a session
     parent_id: str | None = None
     artifact_id: str | None = None
+    assistant_id: str | None = None
 
     # Scoping
-    account_id: str
+    account_id: str | None = (
+        None  # This can be None if the Artifact is a assistant document
+    )

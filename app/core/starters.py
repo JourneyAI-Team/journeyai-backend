@@ -4,6 +4,7 @@ from app.core.config import settings
 from app.db.init_mongo import init_db
 from app.db.init_qdrant import init_qdrant_db
 from app.utils.loki_logger import setup_logger
+from app.utils.prompt_utils import insert_preloaded_assistant
 from app.utils.websocket.redis_listener import start_redis_listener
 
 
@@ -43,6 +44,10 @@ async def initialize_app():
     logger.info("Starting Redis listener...")
     await start_redis_listener()
     logger.success("Redis listener started successfully")
+
+    logger.info("Inserting preloaded assistants...")
+    await insert_preloaded_assistant("new_client_research_prep")
+    logger.success("Preloaded assistants inserted successfully")
 
 
 async def initialize_worker(name: str):
