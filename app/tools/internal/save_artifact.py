@@ -30,8 +30,8 @@ async def save_artifact(
     Args:
         artifact_type (str): The type of artifact to save. It should be a programmatic string
             that describes the type of artifact. (e.g., "person", "location", etc.)
-        title: The title of the artifact.
-        body: The body of the artifact.
+        title (str): The title of the artifact.
+        body (str): The body of the artifact.
     """
 
     arq = await get_arq()
