@@ -31,7 +31,7 @@ async def search_artifacts(
     informed, personalized responses.
 
     Args:
-        query: The query string to use to search for artifacts. Use descriptive terms related to
+        query (str): The query string to use to search for artifacts. Use descriptive terms related to
             what you're looking for (e.g., "user preferences", "project goals", "previous insights").
 
     Returns:

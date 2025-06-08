@@ -28,7 +28,7 @@ async def save_artifact(
     Think of this as your external memory - use it liberally to ensure nothing important is forgotten.
 
     Args:
-        artifact_type: The type of artifact to save. It should be a programmatic string
+        artifact_type (str): The type of artifact to save. It should be a programmatic string
             that describes the type of artifact. (e.g., "person", "location", etc.)
         title: The title of the artifact.
         body: The body of the artifact.
