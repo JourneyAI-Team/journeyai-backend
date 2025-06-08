@@ -25,6 +25,7 @@ class Artifact(Document):
     session_id: str | None = None  # Exists if artifact is created from within a session
     parent_id: str | None = None
     artifact_id: str | None = None
+    assistant_id: str | None = None
 
     # Scoping
     account_id: str | None = (
