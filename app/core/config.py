@@ -50,6 +50,11 @@ class Settings(BaseSettings):
     # Groq
     GROQ_API_KEY: str | None = None
 
+    # Similarity Search Thresholds
+    RELATED_ARTIFACTS_SCORE_THRESHOLD: float = 0.7
+    RELATED_MESSAGES_SCORE_THRESHOLD: float = 0.7
+    SEARCH_ARTIFACTS_SCORE_THRESHOLD: float = 0.7
+
     class Config:
         case_sensitive = True
         extra = "allow"
