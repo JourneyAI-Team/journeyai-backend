@@ -4,6 +4,7 @@ from agents import Agent, RunContextWrapper, WebSearchTool
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
+from app.core.config import settings
 from app.external.ai_service import create_summary_for_search, get_embeddings
 from app.models.assistant import Assistant
 from app.models.user import User
@@ -151,6 +152,7 @@ class AssistantsManager:
                     "id": artifact.id,
                     "title": artifact.payload["title"],
                     "body": artifact.payload["body"],
+                    "type": artifact.payload["type"],
                 }
             )
         return related_artifacts
@@ -200,9 +202,16 @@ class AssistantsManager:
             collection_name="Artifacts",
             query_embedding=await get_embeddings(search_query),
             top_k=10,
+            score_threshold=settings.RELATED_ARTIFACTS_SCORE_THRESHOLD,
             filter=Filter(
                 must=[
                     FieldCondition(key="account_id", match=MatchValue(value=account_id))
+                ],
+                must_not=[
+                    FieldCondition(
+                        key="type",
+                        match=MatchValue(value="assistant_document"),
+                    ),
                 ],
             ),
         )
@@ -218,6 +227,7 @@ class AssistantsManager:
             collection_name="Messages",
             query_embedding=await get_embeddings(search_query),
             top_k=20,
+            score_threshold=settings.RELATED_MESSAGES_SCORE_THRESHOLD,
             filter=Filter(
                 must=[
                     FieldCondition(

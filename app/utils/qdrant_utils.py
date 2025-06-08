@@ -41,6 +41,7 @@ async def search_vectors(
     query_embedding: list[float],
     top_k: int,
     filter: Filter | None = None,
+    score_threshold: float | None = None,
 ) -> list[ScoredPoint]:
     """
     Search for vectors in a Qdrant collection.
@@ -55,6 +56,8 @@ async def search_vectors(
         The number of top results to return.
     filter : Filter | None
         The filter to apply to the search.
+    score_threshold : float | None
+        The score threshold to apply to the search.
 
     Returns
     -------
@@ -69,6 +72,7 @@ async def search_vectors(
             query_vector=query_embedding,
             limit=top_k,
             query_filter=filter,
+            score_threshold=score_threshold,
         )
         return response
     except Exception as e:

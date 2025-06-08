@@ -58,6 +58,12 @@ async def emit_stream_events(
 
         match event.name:
             case "message_output_created":
+
+                annotations = []
+                for content in it.raw_item.content:
+                    if content.type == "output_text":
+                        annotations.extend(content.annotations)
+
                 payload.update(
                     {
                         "kind": "message",
@@ -65,6 +71,7 @@ async def emit_stream_events(
                             "text": ItemHelpers.text_message_output(it),
                             "role": it.raw_item.role,
                             "id": getattr(it.raw_item, "id", None),
+                            "annotations": annotations,
                         },
                     }
                 )

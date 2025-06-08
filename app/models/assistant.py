@@ -30,7 +30,7 @@ class Assistant(Document):
 
     # Agent Parameters
     developer_prompt: str
-    model: str = "o3-mini"
+    model: str = "gpt-4o"
 
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)

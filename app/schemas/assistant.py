@@ -21,6 +21,14 @@ class AssistantBase(BaseModel):
                 "type": ToolType.INTERNAL,
             },
             {
+                "name": "search_artifacts",
+                "type": ToolType.INTERNAL,
+            },
+            {
+                "name": "search_assistant_documents",
+                "type": ToolType.INTERNAL,
+            },
+            {
                 "name": "openai_web_search",
                 "type": ToolType.EXTERNAL,
             },

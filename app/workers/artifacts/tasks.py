@@ -22,15 +22,7 @@ async def post_artifact_creation(ctx, id: str):
     await insert_vector(
         collection_name="Artifacts",
         id=artifact.id,
-        payload={
-            "session_id": artifact.session_id,
-            "user_id": artifact.user_id,
-            "organization_id": artifact.organization_id,
-            "account_id": artifact.account_id,
-            "title": artifact.title,
-            "body": artifact.body,
-            "origin": artifact.origin_type.value,
-        },
+        payload=artifact.model_dump(),
         vector=artifact_embeddings,
     )
 
