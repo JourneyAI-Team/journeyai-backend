@@ -12,30 +12,36 @@ from app.schemas.types import OriginType
 async def save_artifact(
     wrapper: RunContextWrapper[AgentContext], artifact_type: str, title: str, body: str
 ) -> dict:
-    """**CRITICAL FOR MEMORY RETENTION** - This is your ONLY way to remember information across conversations!
+    """**CRITICAL FOR MEMORY RETENTION** - Save important research findings and insights permanently.
 
-    Without using this tool, ALL information from this conversation will be permanently lost when the chat ends.
-    You MUST save important details, insights, preferences, context, and any information you'll need to reference
-    in future conversations. This is not optional - it's essential for providing continuity and personalized
-    assistance to the user.
+    This is your ONLY way to preserve information across conversations and sessions. ALL research
+    findings, insights, and important details will be lost when the chat ends unless you save them here.
 
-    Use this tool proactively and frequently throughout conversations to:
-    - Save user preferences, goals, and context
-    - Record important insights or discoveries
-    - Store key information that builds over time
-    - Maintain continuity across chat sessions
+    **WHEN TO USE THIS TOOL:**
+    - After completing any research task or gathering significant information
+    - When you discover key insights about a company, industry, or competitive landscape
+    - When you identify important stakeholder information or contact details
+    - After analyzing customer profiles, market positioning, or strategic insights
+    - When preparing meeting summaries or action items
+    - Whenever you want to reference specific findings in future conversations
 
-    Think of this as your external memory - use it liberally to ensure nothing important is forgotten.
+    **RESEARCH-SPECIFIC USAGE:**
+    - Save company profiles, competitive analyses, and industry insights
+    - Store stakeholder research and key decision-maker information
+    - Preserve customer profile findings and target market analysis
+    - Record strategic recommendations and meeting preparation notes
+
+    Use this tool proactively throughout your research process - not just at the end.
+    Think of this as building a permanent knowledge base for ongoing client relationships.
 
     Args:
-        artifact_type (str): The type of artifact to save. It should be a programmatic string
-            that describes the type of artifact. (e.g., "person", "location", etc.)
-        title (str): The title of the artifact.
-        body (str): The body of the artifact.
+        artifact_type (str): The type of research artifact (e.g., "company_profile", "competitive_analysis",
+            "stakeholder_research", "industry_insights", "customer_profile", "meeting_prep")
+        title (str): Clear, descriptive title for easy future reference
+        body (str): Detailed content including key findings, insights, and actionable information
 
     Returns:
-        dict: A dictionary with the following keys:
-            - id (str): The ID of the artifact that was just created.
+        dict: Confirmation with the ID of the saved artifact
     """
 
     arq = await get_arq()

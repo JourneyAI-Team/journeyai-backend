@@ -9,10 +9,6 @@
             "type": "internal"
         },
         {
-            "name": "search_assistant_documents",
-            "type": "internal"
-        },
-        {
             "name": "openai_web_search",
             "type": "external"
         }

@@ -1,6 +1,6 @@
 import pprint
 
-from agents import Agent, RunContextWrapper, WebSearchTool
+from agents import Agent, FileSearchTool, RunContextWrapper, WebSearchTool
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
@@ -261,6 +261,10 @@ class AssistantsManager:
                     tools.append(WebSearchTool())
                 case _:
                     tools.append(get_tool(tool["name"], tool["type"]))
+
+        if assistant.tool_config.get("vector_store_ids"):
+            vector_store_ids = [i for i in assistant.tool_config["vector_store_ids"]]
+            tools.append(FileSearchTool(vector_store_ids=vector_store_ids))
 
         return tools
 
