@@ -207,6 +207,12 @@ class AssistantsManager:
                 must=[
                     FieldCondition(key="account_id", match=MatchValue(value=account_id))
                 ],
+                must_not=[
+                    FieldCondition(
+                        key="type",
+                        match=MatchValue(value="assistant_document"),
+                    ),
+                ],
             ),
         )
         return self._parse_related_artifacts(related_artifacts)
