@@ -264,7 +264,11 @@ class AssistantsManager:
 
         if assistant.tool_config.get("vector_store_ids"):
             vector_store_ids = [i for i in assistant.tool_config["vector_store_ids"]]
-            tools.append(FileSearchTool(vector_store_ids=vector_store_ids))
+            tools.append(
+                FileSearchTool(
+                    vector_store_ids=vector_store_ids, include_search_results=True
+                )
+            )
 
         return tools
 
