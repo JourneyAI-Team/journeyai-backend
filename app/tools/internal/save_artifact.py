@@ -11,7 +11,7 @@ from app.schemas.types import OriginType
 @function_tool
 async def save_artifact(
     wrapper: RunContextWrapper[AgentContext], artifact_type: str, title: str, body: str
-):
+) -> dict:
     """**CRITICAL FOR MEMORY RETENTION** - This is your ONLY way to remember information across conversations!
 
     Without using this tool, ALL information from this conversation will be permanently lost when the chat ends.
@@ -32,6 +32,10 @@ async def save_artifact(
             that describes the type of artifact. (e.g., "person", "location", etc.)
         title (str): The title of the artifact.
         body (str): The body of the artifact.
+
+    Returns:
+        dict: A dictionary with the following keys:
+            - id (str): The ID of the artifact that was just created.
     """
 
     arq = await get_arq()
@@ -50,6 +54,8 @@ async def save_artifact(
     await arq.enqueue_job(
         "post_artifact_creation", new_artifact.id, _queue_name="artifacts"
     )
+
+    return {"id": new_artifact.id}
 
 
 def get_tool() -> Callable:
