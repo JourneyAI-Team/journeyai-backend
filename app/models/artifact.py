@@ -20,8 +20,8 @@ class Artifact(Document):
     )
 
     # Relations
-    user_id: str
-    organization_id: str
+    user_id: str | None = None
+    organization_id: str | None = None
     session_id: str | None = None  # Exists if artifact is created from within a session
     parent_id: str | None = None
     artifact_id: str | None = None
