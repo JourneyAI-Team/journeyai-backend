@@ -4,6 +4,9 @@ from pprint import pformat
 from agents import ItemHelpers, RunResultStreaming
 from agents.items import ResponseComputerToolCall, ResponseFunctionToolCall
 from loguru import logger
+from openai.types.responses.response_file_search_tool_call import (
+    ResponseFileSearchToolCall,
+)
 from openai.types.responses.response_text_delta_event import ResponseTextDeltaEvent
 
 from app.core.assistants import assistants_manager
@@ -98,6 +101,14 @@ async def emit_stream_events(
                         "status": it.raw_item.status,
                         "pending_safety_checks": it.raw_item.pending_safety_checks,
                         "call_id": it.raw_item.call_id,
+                    }
+                elif isinstance(it.raw_item, ResponseFileSearchToolCall):
+                    tool_info = {
+                        "id": it.raw_item.id,
+                        "queries": it.raw_item.queries,
+                        "status": it.raw_item.status,
+                        "name": it.raw_item.type,
+                        "results": [r.model_dump() for r in it.raw_item.results or []],
                     }
                 else:
                     tool_info = {
