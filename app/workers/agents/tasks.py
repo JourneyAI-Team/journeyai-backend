@@ -62,7 +62,9 @@ async def emit_stream_events(
                 annotations = []
                 for content in it.raw_item.content:
                     if content.type == "output_text":
-                        annotations.extend(content.annotations)
+                        annotations.extend(
+                            [a.model_dump() for a in content.annotations]
+                        )
 
                 payload.update(
                     {
