@@ -33,6 +33,9 @@ async def search_artifacts(
     Args:
         query: The query string to use to search for artifacts. Use descriptive terms related to
             what you're looking for (e.g., "user preferences", "project goals", "previous insights").
+
+    Returns:
+        dict: A list of artifacts that match the query.
     """
 
     search_embedding = await get_embeddings(query)
