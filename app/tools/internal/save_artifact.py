@@ -12,9 +12,20 @@ from app.schemas.types import OriginType
 async def save_artifact(
     wrapper: RunContextWrapper[AgentContext], artifact_type: str, title: str, body: str
 ):
-    """Save an artifact to your memory. Think of artifacts as notes or highlights from
-    the conversation you are having with the user. It is highly recommended to frequently
-    take notes to enrich your memory.
+    """**CRITICAL FOR MEMORY RETENTION** - This is your ONLY way to remember information across conversations!
+
+    Without using this tool, ALL information from this conversation will be permanently lost when the chat ends.
+    You MUST save important details, insights, preferences, context, and any information you'll need to reference
+    in future conversations. This is not optional - it's essential for providing continuity and personalized
+    assistance to the user.
+
+    Use this tool proactively and frequently throughout conversations to:
+    - Save user preferences, goals, and context
+    - Record important insights or discoveries
+    - Store key information that builds over time
+    - Maintain continuity across chat sessions
+
+    Think of this as your external memory - use it liberally to ensure nothing important is forgotten.
 
     Args:
         artifact_type: The type of artifact to save. It should be a programmatic string
