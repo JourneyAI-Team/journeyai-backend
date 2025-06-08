@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Any
 
@@ -103,9 +104,11 @@ async def insert_preloaded_assistant(
 
         assistant_dir_path = os.path.join(os.getcwd(), "prompts", "assistants", name)
         master_file_path = os.path.join(assistant_dir_path, "master.md")
+        tool_config_path = os.path.join(assistant_dir_path, "tool_config.json")
 
         logger.debug(f"Assistant directory path: {assistant_dir_path}")
         logger.debug(f"Master file path: {master_file_path}")
+        logger.debug(f"Tool config file path: {tool_config_path}")
 
         # Check if the assistant is already in the database
         existing_assistant = await Assistant.find_one({"internal_name": internal_name})
@@ -127,11 +130,24 @@ async def insert_preloaded_assistant(
             logger.exception(f"Error reading master.md file: {str(e)}")
             raise
 
+        # Read tool_config.json for the tool configuration
+        try:
+            with open(tool_config_path, "r", encoding="utf-8") as file:
+                tool_config = json.load(file)
+            logger.debug("Successfully read tool_config.json file")
+        except FileNotFoundError:
+            logger.error(f"Tool config file not found: {tool_config_path}")
+            raise
+        except Exception as e:
+            logger.exception(f"Error reading tool_config.json file: {str(e)}")
+            raise
+
         # Create Assistant object with placeholders for other fields
         assistant = Assistant(
             name=name.replace("_", " ").title(),
             internal_name=internal_name,
             description=f"Pre-loaded assistant: {name}",
+            tool_config=tool_config,
             developer_prompt=developer_prompt,
             model="gpt-4o",  # Default model
             testing=True,  # Mark as testing since it's pre-loaded
