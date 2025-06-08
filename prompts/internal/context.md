@@ -1,0 +1,75 @@
+# Context Information
+
+You have access to relevant context to help deliver personalized and informed responses. Use this information strategically to enhance your assistance.
+
+## Account Information
+{% if instructions_context.account_info %}
+
+**Account Name:** {{ instructions_context.account_info['name'] }}  
+**Description:** {{ instructions_context.account_info['description'] }}
+{% else %}
+
+*No account information available for this session.*
+{% endif %}
+
+## User Profile
+{% if instructions_context.user_profile %}
+
+**Personalization Guidelines:**
+- Adapt communication style to match user preferences
+- Reference their interests, goals, and background when relevant  
+- Maintain continuity across conversations
+- Provide contextually appropriate assistance
+
+**User Details:**
+{% for key, value in instructions_context.user_profile.items() %}
+- **{{ key|title|replace('_', ' ') }}:** {{ value }}
+{% endfor %}
+{% else %}
+
+*No user profile information available for this session.*
+{% endif %}
+
+## Related Artifacts
+{% if instructions_context.related_artifacts %}
+
+The following knowledge artifacts are relevant to this conversation:
+
+{% for artifact in instructions_context.related_artifacts %}
+### {{ artifact['title'] }}
+*Artifact ID: {{ artifact['id'] }}*
+
+{{ artifact['body'] }}
+
+{% if not loop.last %}---{% endif %}
+
+{% endfor %}
+{% else %}
+
+*No related artifacts found for this conversation context.*
+{% endif %}
+
+## Related Messages
+{% if instructions_context.related_messages %}
+
+Previous conversation snippets that provide relevant context:
+
+{% for message in instructions_context.related_messages %}
+**{{ message['sender']|title }}** *(Message ID: {{ message['id'] }})*:
+{{ message['content'] }}
+
+{% if not loop.last %}---{% endif %}
+
+{% endfor %}
+{% else %}
+
+*No related message history found.*
+{% endif %}
+
+## Context Usage Instructions
+
+1. **Prioritize recent information** - Newer context should take precedence over older information
+2. **Reference by ID** - When referring to artifacts or messages, use their specific IDs  
+3. **Maintain consistency** - Keep responses aligned with established user preferences and communication patterns
+4. **Leverage account context** - Use account information to provide appropriately scoped responses
+5. **Synthesize effectively** - Combine multiple context sources to provide comprehensive assistance

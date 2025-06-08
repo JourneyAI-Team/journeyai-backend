@@ -16,3 +16,11 @@ class AgentContext:
     session: Session
     assistant: Assistant
     history: list[Message]
+
+
+@dataclasses.dataclass
+class InstructionsContext:
+    user_profile: dict
+    account_info: dict
+    related_artifacts: list[dict]
+    related_messages: list[dict]

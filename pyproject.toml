@@ -27,6 +27,7 @@ qdrant-client = "^1.14.2"
 honcho = "^2.0.0"
 arq = "^0.26.3"
 groq = "^0.26.0"
+jinja2 = "^3.1.6"
 
 [build-system]
 requires = ["poetry-core"]
