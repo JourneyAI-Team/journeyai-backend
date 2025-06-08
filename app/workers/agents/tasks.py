@@ -6,10 +6,10 @@ from agents.items import ResponseComputerToolCall, ResponseFunctionToolCall
 from loguru import logger
 from openai.types.responses.response_text_delta_event import ResponseTextDeltaEvent
 
+from app.core.assistants import assistants_manager
 from app.external.ai_service import generate_response
 from app.models.message import Message
 from app.schemas.types import SenderType
-from app.utils.assistant_utils import get_agent_from_assistant
 from app.utils.websocket.communications import send_to_websocket
 from app.workers.agents.utils import (
     convert_messages_to_openai_format,
@@ -197,7 +197,7 @@ async def process_session(ctx, connection_id: str, session_id: str):
         message_id=messages[-1].id,
     ):
 
-        agent = get_agent_from_assistant(assistant)
+        agent = await assistants_manager.get_agent(assistant)
         logger.info(f"Agent: {agent}")
         logger.info(f"Fetched {len(messages)} messages in session: {session_id}")
         logger.debug(pformat(messages))
