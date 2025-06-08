@@ -80,6 +80,10 @@ class AssistantsManager:
             instructions = render_prompt_template(
                 "internal/context.md", {"instructions_context": instructions_context}
             )
+            instructions = (
+                f"{wrapper.context.assistant.developer_prompt}\n\n\n{instructions}"
+            )
+
             logger.debug(f"Instructions: {instructions}")
             logger.info(f"Created instructions for {wrapper.context.user}.")
 
