@@ -26,6 +26,7 @@ class ArtifactCreate(ArtifactBase):
     # Relations
     parent_id: str | None = None
     session_id: str | None = None
+    assistant_id: str | None = None
 
     # Scoping
     account_id: str | None = None
@@ -50,3 +51,4 @@ class ArtifactRead(ArtifactBase):
     session_id: str | None
     parent_id: str | None
     account_id: str
+    assistant_id: str | None
