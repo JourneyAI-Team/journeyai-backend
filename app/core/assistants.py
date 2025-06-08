@@ -249,3 +249,6 @@ class AssistantsManager:
                     tools.append(get_tool(tool["name"], tool["type"]))
 
         return tools
+
+
+assistants_manager = AssistantsManager()
