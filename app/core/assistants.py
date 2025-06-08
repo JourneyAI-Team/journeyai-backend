@@ -23,7 +23,7 @@ from app.utils.tool_utils import get_tool
 
 class AssistantsManager:
     def __init__(self):
-        pass
+        self._agent_cache: dict[str, Agent[AgentContext]] = {}
 
     async def get_agent(self, assistant: Assistant) -> Agent[AgentContext]:
         """
@@ -40,8 +40,13 @@ class AssistantsManager:
             The agent for the assistant.
         """
 
+        # Check if agent already exists in cache
+        if assistant.id in self._agent_cache:
+            return self._agent_cache[assistant.id]
+
+        # Create new agent if not in cache
         tools = self.get_tools(assistant)
-        return Agent[AgentContext](
+        agent = Agent[AgentContext](
             name=assistant.name,
             model=assistant.model,
             tools=tools,
@@ -51,6 +56,10 @@ class AssistantsManager:
             ),
             reset_tool_choice=True,
         )
+
+        # Cache the agent
+        self._agent_cache[assistant.id] = agent
+        return agent
 
     async def create_instructions(
         self, wrapper: RunContextWrapper[AgentContext], agent: Agent[AgentContext]
