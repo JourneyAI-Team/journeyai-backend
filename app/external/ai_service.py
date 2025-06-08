@@ -44,7 +44,7 @@ async def create_summary_for_search(messages: list[Message]) -> str:
         },
     ]
 
-    logger.info(f"Creating summary for search for {len(messages)} messages")
+    logger.debug(f"Creating summary for search for {len(messages)} messages.")
 
     if settings.GROQ_API_KEY:
         client = get_groq_async_client()
@@ -67,6 +67,8 @@ async def create_summary_for_search(messages: list[Message]) -> str:
 
     else:
         raise ValueError("No LLM provider configured. Cannot use any LLM service.")
+
+    logger.info(f"Created summary for search for {len(messages)} messages.")
 
     return summary
 
