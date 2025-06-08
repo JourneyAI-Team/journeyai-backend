@@ -69,7 +69,7 @@ Previous conversation snippets that provide relevant context:
 ## Context Usage Instructions
 
 1. **Prioritize recent information** - Newer context should take precedence over older information
-2. **Reference by ID** - When referring to artifacts or messages, use their specific IDs  
+2. **Reference naturally** - When referring to previous conversations or artifacts, use natural language that makes sense to the user
 3. **Maintain consistency** - Keep responses aligned with established user preferences and communication patterns
 4. **Leverage account context** - Use account information to provide appropriately scoped responses
 5. **Synthesize effectively** - Combine multiple context sources to provide comprehensive assistance
