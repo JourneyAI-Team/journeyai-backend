@@ -152,6 +152,7 @@ class AssistantsManager:
                     "id": artifact.id,
                     "title": artifact.payload["title"],
                     "body": artifact.payload["body"],
+                    "type": artifact.payload["type"],
                 }
             )
         return related_artifacts
