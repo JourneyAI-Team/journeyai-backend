@@ -45,8 +45,14 @@ async def search_artifacts(
             must=[
                 FieldCondition(
                     key="account_id", match=MatchValue(value=wrapper.context.account.id)
-                )
-            ]
+                ),
+            ],
+            must_not=[
+                FieldCondition(
+                    key="type",
+                    match=MatchValue(value="assistant_document"),
+                ),
+            ],
         ),
     )
 
