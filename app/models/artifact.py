@@ -27,4 +27,6 @@ class Artifact(Document):
     artifact_id: str | None = None
 
     # Scoping
-    account_id: str
+    account_id: str | None = (
+        None  # This can be None if the Artifact is a assistant document
+    )
