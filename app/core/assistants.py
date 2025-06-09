@@ -177,6 +177,10 @@ class AssistantsManager:
             else:
                 data["content"] = message.payload["output"]
 
+                # Remove file search results to not waste tokens
+                if data["content"].get("type") == "file_search_call":
+                    data["content"].pop("results", None)
+
             related_messages.append(data)
 
         return related_messages
