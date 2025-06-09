@@ -5,7 +5,7 @@ from typing import List
 from faker import Faker
 from tqdm.asyncio import tqdm_asyncio  # nice progress bar for asyncio
 
-from app.db.init_db import init_db
+from app.db.init_mongo import init_db
 from app.models.account import Account
 from app.models.organization import Organization
 from app.models.session import Session
