@@ -288,8 +288,5 @@ class AssistantsManager:
     async def get_base_mcp_servers(self):
         return [MCPServerStdio(get_search1api_mcp_server_params())]
 
-    async def get_base_mcp_servers(self):
-        return [MCPServerStdio(get_search1api_mcp_server_params())]
-
 
 assistants_manager = AssistantsManager()
