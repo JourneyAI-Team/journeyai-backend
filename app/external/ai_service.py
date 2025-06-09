@@ -168,7 +168,7 @@ async def generate_response(
         context=agent_context,
         run_config=RunConfig(
             group_id=session_id,
-            trace_id=history[-1].id,
+            trace_id=f"trace_{history[-1].id}",
             trace_metadata={
                 "session_id": session_id,
                 "assistant_id": assistant.id,
