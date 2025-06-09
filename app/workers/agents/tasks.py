@@ -1,5 +1,4 @@
 import datetime as dt
-from pprint import pformat
 
 from agents import ItemHelpers, RunResultStreaming
 from agents.items import ResponseComputerToolCall, ResponseFunctionToolCall
@@ -221,10 +220,10 @@ async def process_session(ctx, connection_id: str, session_id: str):
 
         if len(messages) == 1:
             agent.model_settings.tool_choice = "file_search"
+            logger.info("Forcing tool choice to file search for first message.")
 
         logger.info(f"Agent: {agent}")
         logger.info(f"Fetched {len(messages)} messages in session: {session_id}")
-        logger.debug(pformat(messages))
         logger.info(f"Processing session: {session_id}")
 
         # Convert the messages into a format OpenAI understands

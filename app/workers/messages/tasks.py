@@ -20,17 +20,16 @@ async def post_message_creation(ctx, id: str):
         account_id=message.account_id,
     ):
 
-        if message.embed_after_insert:
-            logger.debug("Embedding message...")
+        logger.debug("Embedding message...")
 
-            embedding_input = await construct_embedding_input_for_message(message)
-            message_embeddings = await get_embeddings(embedding_input)
+        embedding_input = await construct_embedding_input_for_message(message)
+        message_embeddings = await get_embeddings(embedding_input)
 
-            await insert_vector(
-                collection_name="Messages",
-                id=message.id,
-                payload=message.model_dump(),
-                vector=message_embeddings,
-            )
+        await insert_vector(
+            collection_name="Messages",
+            id=message.id,
+            payload=message.model_dump(),
+            vector=message_embeddings,
+        )
 
-            logger.success(f"Successfully embedded message: {message.id}")
+        logger.success(f"Successfully embedded message: {message.id}")

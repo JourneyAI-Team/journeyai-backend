@@ -88,8 +88,6 @@ class AssistantsManager:
             instructions = (
                 f"{wrapper.context.assistant.developer_prompt}\n\n\n{instructions}"
             )
-
-            logger.debug(f"Instructions: {instructions}")
             logger.info(f"Created instructions for {wrapper.context.user}.")
 
             return instructions
@@ -129,7 +127,7 @@ class AssistantsManager:
                 search_query, context.account.id
             )
             related_messages = await self._search_related_messages(
-                search_query, context.account.id
+                search_query, context.account.id, context.session.id
             )
             logger.debug(f"Related artifacts: {pprint.pformat(related_artifacts)}")
             logger.debug(f"Related messages: {pprint.pformat(related_messages)}")
@@ -177,6 +175,10 @@ class AssistantsManager:
             else:
                 data["content"] = message.payload["output"]
 
+                # Remove file search results to not waste tokens
+                if data["content"].get("type") == "file_search_call":
+                    data["content"].pop("results", None)
+
             related_messages.append(data)
 
         return related_messages
@@ -222,7 +224,7 @@ class AssistantsManager:
         return self._parse_related_artifacts(related_artifacts)
 
     async def _search_related_messages(
-        self, search_query: str, account_id: str
+        self, search_query: str, account_id: str, session_id: str
     ) -> list[dict]:
         """
         Search for related messages in the database.
@@ -237,7 +239,10 @@ class AssistantsManager:
                     FieldCondition(
                         key="account_id", match=MatchValue(value=account_id)
                     ),
-                ]
+                ],
+                must_not=[
+                    FieldCondition(key="session_id", match=MatchValue(value=session_id))
+                ],
             ),
         )
         return self._parse_related_messages(related_messages)
