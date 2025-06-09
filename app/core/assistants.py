@@ -1,6 +1,12 @@
 import pprint
 
-from agents import Agent, RunContextWrapper, WebSearchTool
+from agents import (
+    Agent,
+    FileSearchTool,
+    ModelSettings,
+    RunContextWrapper,
+    WebSearchTool,
+)
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
@@ -17,7 +23,7 @@ from app.utils.tool_utils import get_tool
 
 class AssistantsManager:
     def __init__(self):
-        pass
+        self._agent_cache: dict[str, Agent[AgentContext]] = {}
 
     async def get_agent(self, assistant: Assistant) -> Agent[AgentContext]:
         """
@@ -34,13 +40,26 @@ class AssistantsManager:
             The agent for the assistant.
         """
 
+        # Check if agent already exists in cache
+        if assistant.id in self._agent_cache:
+            return self._agent_cache[assistant.id]
+
+        # Create new agent if not in cache
         tools = self.get_tools(assistant)
-        return Agent[AgentContext](
+        agent = Agent[AgentContext](
             name=assistant.name,
             model=assistant.model,
             tools=tools,
             instructions=self.create_instructions,
+            model_settings=ModelSettings(
+                tool_choice="file_search",
+            ),
+            reset_tool_choice=True,
         )
+
+        # Cache the agent
+        self._agent_cache[assistant.id] = agent
+        return agent
 
     async def create_instructions(
         self, wrapper: RunContextWrapper[AgentContext], agent: Agent[AgentContext]
@@ -261,6 +280,14 @@ class AssistantsManager:
                     tools.append(WebSearchTool())
                 case _:
                     tools.append(get_tool(tool["name"], tool["type"]))
+
+        if assistant.tool_config.get("vector_store_ids"):
+            vector_store_ids = [i for i in assistant.tool_config["vector_store_ids"]]
+            tools.append(
+                FileSearchTool(
+                    vector_store_ids=vector_store_ids, include_search_results=True
+                )
+            )
 
         return tools
 

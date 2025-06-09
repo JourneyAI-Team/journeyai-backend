@@ -3,7 +3,7 @@ import uuid
 
 from beanie import Document
 from pydantic import Field
-from typing_extensions import TypedDict
+from typing_extensions import NotRequired, TypedDict
 
 from app.schemas.types import ToolType
 
@@ -14,7 +14,8 @@ class AssistantTool(TypedDict):
 
 
 class AssistantToolConfig(TypedDict):
-    tools: list[AssistantTool]
+    tools: NotRequired[list[AssistantTool]]
+    vector_store_ids: NotRequired[list[str]]
 
 
 class Assistant(Document):

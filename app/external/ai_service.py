@@ -1,7 +1,7 @@
 import pprint
 from typing import List
 
-from agents import Agent, Runner
+from agents import Agent, RunConfig, Runner
 from loguru import logger
 from openai.types.responses.response_input_item_param import ResponseInputItemParam
 
@@ -162,6 +162,21 @@ async def generate_response(
     )
 
     logger.info(f"Generating response using agent: {agent.name}")
-    result = Runner.run_streamed(agent, input=input, context=agent_context)
+    result = Runner.run_streamed(
+        agent,
+        input=input,
+        context=agent_context,
+        run_config=RunConfig(
+            group_id=session_id,
+            trace_metadata={
+                "session_id": session_id,
+                "assistant_id": assistant.id,
+                "user_id": user_id,
+                "organization_id": organization_id,
+                "account_id": account_id,
+            },
+            workflow_name=agent.name,
+        ),
+    )
 
     return result

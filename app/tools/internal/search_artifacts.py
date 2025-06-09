@@ -14,28 +14,36 @@ async def search_artifacts(
     wrapper: RunContextWrapper[AgentContext],
     query: str,
 ) -> dict:
-    """Access stored information and context to provide better assistance.
+    """Access your saved research findings and client knowledge base for better assistance.
 
-    Use this tool to retrieve stored artifacts containing various types of information that can inform your responses.
-    Artifacts include both assistant-saved memories and user-provided context such as documents, lead information,
-    project details, and other relevant data.
+    Use this tool to retrieve previously saved research artifacts, insights, and context that can
+    inform your current analysis. This includes both research you've previously saved and
+    user-provided information about clients, projects, and strategic context.
 
-    Consider searching for artifacts proactively, especially at the start of conversations or when context is lacking:
-    - Look for user preferences, goals, and background information
-    - Find user-provided documents or context about specific leads/projects
-    - Retrieve past insights or discoveries relevant to current topics
-    - Access historical context that builds understanding over time
-    - Find any information that would help provide better assistance
+    **WHEN TO USE THIS TOOL:**
+    - At the start of conversations to gather existing knowledge about a client or company
+    - When you need background context before beginning new research
+    - When looking for previous research findings about competitors or industry insights
+    - When searching for stakeholder information or decision-maker profiles you've saved before
+    - When building on previous analysis or connecting insights across conversations
+    - When you need user preferences, goals, or strategic context for better assistance
 
-    Think of this as accessing a shared knowledge base to understand the full context and provide more
-    informed, personalized responses.
+    **RESEARCH-SPECIFIC USAGE:**
+    - Find existing company profiles and competitive analyses
+    - Retrieve previous stakeholder research and contact information
+    - Access saved industry insights and market analysis
+    - Locate customer profile research and target market findings
+    - Search for meeting notes and strategic recommendations
+
+    Think of this as accessing your research knowledge base to provide informed,
+    context-aware assistance that builds on previous work.
 
     Args:
-        query (str): The query string to use to search for artifacts. Use descriptive terms related to
-            what you're looking for (e.g., "user preferences", "project goals", "previous insights").
+        query (str): Search terms describing what you're looking for (e.g., "company background",
+            "competitive analysis", "stakeholder research", "industry trends", "previous insights")
 
     Returns:
-        dict: A list of artifacts that match the query.
+        dict: List of matching research artifacts with details including title, body, and type
     """
 
     search_embedding = await get_embeddings(query)
