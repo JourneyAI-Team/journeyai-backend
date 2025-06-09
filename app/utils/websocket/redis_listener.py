@@ -96,7 +96,6 @@ class RedisListener:
 
                 if connection_id and connection_id in active_connections:
                     await send_message(connection_id, event, event_data)
-                    logger.debug(f"Message sent to connection {connection_id}: {event}")
                 else:
                     logger.warning(
                         f"Received message for non-existent connection: {connection_id}"
