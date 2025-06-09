@@ -1,12 +1,6 @@
 import pprint
 
-from agents import (
-    Agent,
-    FileSearchTool,
-    ModelSettings,
-    RunContextWrapper,
-    WebSearchTool,
-)
+from agents import Agent, FileSearchTool, RunContextWrapper, WebSearchTool
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
@@ -23,7 +17,7 @@ from app.utils.tool_utils import get_tool
 
 class AssistantsManager:
     def __init__(self):
-        self._agent_cache: dict[str, Agent[AgentContext]] = {}
+        pass
 
     async def get_agent(self, assistant: Assistant) -> Agent[AgentContext]:
         """
@@ -40,10 +34,6 @@ class AssistantsManager:
             The agent for the assistant.
         """
 
-        # Check if agent already exists in cache
-        if assistant.id in self._agent_cache:
-            return self._agent_cache[assistant.id]
-
         # Create new agent if not in cache
         tools = self.get_tools(assistant)
         agent = Agent[AgentContext](
@@ -51,14 +41,9 @@ class AssistantsManager:
             model=assistant.model,
             tools=tools,
             instructions=self.create_instructions,
-            model_settings=ModelSettings(
-                tool_choice="file_search",
-            ),
             reset_tool_choice=True,
         )
 
-        # Cache the agent
-        self._agent_cache[assistant.id] = agent
         return agent
 
     async def create_instructions(
