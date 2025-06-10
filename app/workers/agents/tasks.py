@@ -36,19 +36,19 @@ async def emit_stream_events(
         The session ID for the current session.
     """
     async for event in result.stream_events():
-        payload = {"ts": dt.datetime.now(tz=dt.timezone.utc).isoformat()}
+        payload = {}
 
         # ── 1. token-level streaming ──────────────────────────────────
         if event.type == "raw_response_event" and isinstance(
             event.data, ResponseTextDeltaEvent
         ):
-            payload.update({"kind": "token", "delta": event.data.delta})
+            payload.update({"type": "token", "delta": event.data.delta})
             await send_to_websocket(connection_id, "agent_response", payload)
             continue
 
         # ── 2. agent switch notifications ────────────────────────────
         if event.type == "agent_updated_stream_event":
-            payload.update({"kind": "agent_switch", "agent": event.new_agent.name})
+            payload.update({"type": "agent_switch", "agent": event.new_agent.name})
             await send_to_websocket(connection_id, "agent_response", payload)
             continue
 
@@ -60,93 +60,20 @@ async def emit_stream_events(
 
         match event.name:
             case "message_output_created":
-
-                annotations = []
-                for content in it.raw_item.content:
-                    if content.type == "output_text":
-                        annotations.extend(
-                            [a.model_dump() for a in content.annotations]
-                        )
-
-                payload.update(
-                    {
-                        "kind": "message",
-                        "message": {
-                            "text": ItemHelpers.text_message_output(it),
-                            "role": it.raw_item.role,
-                            "id": getattr(it.raw_item, "id", None),
-                            "annotations": annotations,
-                        },
-                    }
-                )
+                payload.update(it.raw_item.model_dump())
 
             case "tool_called":
-                if isinstance(it.raw_item, ResponseFunctionToolCall):
-                    tool_info = {
-                        "id": getattr(it.raw_item, "id", None),
-                        # Fallbacks cater for differences between LLM providers
-                        "name": getattr(it.raw_item, "name", None)
-                        or getattr(getattr(it.raw_item, "function", {}), "name", None),
-                        "arguments": getattr(it.raw_item, "arguments", None)
-                        or getattr(
-                            getattr(it.raw_item, "function", {}), "arguments", None
-                        ),
-                    }
-                elif isinstance(it.raw_item, ResponseComputerToolCall):
-                    tool_info = {
-                        "id": it.raw_item.id,
-                        "action": it.raw_item.action.model_dump(),
-                        "name": "computer_tool",
-                        "status": it.raw_item.status,
-                        "pending_safety_checks": it.raw_item.pending_safety_checks,
-                        "call_id": it.raw_item.call_id,
-                    }
-                elif isinstance(it.raw_item, ResponseFileSearchToolCall):
-                    tool_info = {
-                        "id": it.raw_item.id,
-                        "queries": it.raw_item.queries,
-                        "status": it.raw_item.status,
-                        "name": it.raw_item.type,
-                        "results": [r.model_dump() for r in it.raw_item.results or []],
-                    }
-                else:
-                    tool_info = {
-                        "id": it.raw_item.id,
-                        "name": "web_search",
-                        "status": it.raw_item.status,
-                    }
-                payload.update({"kind": "tool_call", "tool": tool_info})
+
+                payload.update(it.raw_item.model_dump())
 
             case "tool_output":
 
-                if it.raw_item["type"] == "function_call_output":
-                    tool_info = {
-                        "id": it.raw_item.get("id"),
-                        "call_id": it.raw_item["call_id"],
-                        "raw_output": it.raw_item["output"],
-                        "output": it.output,
-                    }
-                elif it.raw_item["type"] == "computer_call_output":
-                    tool_info = {
-                        "id": it.raw_item.get("id"),
-                        "call_id": it.raw_item["call_id"],
-                        "raw_output": it.raw_item["output"],
-                        "output": it.output,
-                    }
-                else:
-                    tool_info = {}
-
-                payload.update(
-                    {
-                        "kind": "tool_output",
-                        "tool": tool_info,
-                    }
-                )
+                payload.update(it.raw_item.model_dump())
 
             case "handoff_requested":
                 payload.update(
                     {
-                        "kind": "handoff",
+                        "type": "handoff",
                         "action": "requested",
                         "from": getattr(it.agent, "name", None),
                         "to": getattr(
@@ -158,7 +85,7 @@ async def emit_stream_events(
             case "handoff_occured":
                 payload.update(
                     {
-                        "kind": "handoff",
+                        "type": "handoff",
                         "action": "completed",
                         "from": getattr(it.source_agent, "name", None),
                         "to": getattr(it.target_agent, "name", None),
