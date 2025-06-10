@@ -1,6 +1,7 @@
 import pprint
 
 from agents import Agent, FileSearchTool, RunContextWrapper, WebSearchTool
+from agents.mcp.server import MCPServerStdio
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
@@ -10,6 +11,9 @@ from app.models.assistant import Assistant
 from app.models.user import User
 from app.schemas.agent_context import AgentContext, InstructionsContext
 from app.schemas.types import SenderType
+from app.tools.mcp_servers.search1api import (
+    get_mcp_server_params as get_search1api_mcp_server_params,
+)
 from app.utils.prompt_utils import render_prompt_template
 from app.utils.qdrant_utils import search_vectors
 from app.utils.tool_utils import get_tool
@@ -267,7 +271,8 @@ class AssistantsManager:
         for tool in assistant.tool_config["tools"]:
             match tool["name"]:
                 case "openai_web_search":
-                    tools.append(WebSearchTool())
+                    # tools.append(WebSearchTool())
+                    pass
                 case _:
                     tools.append(get_tool(tool["name"], tool["type"]))
 
@@ -280,6 +285,9 @@ class AssistantsManager:
             )
 
         return tools
+
+    async def get_base_mcp_servers(self):
+        return [MCPServerStdio(get_search1api_mcp_server_params())]
 
 
 assistants_manager = AssistantsManager()
