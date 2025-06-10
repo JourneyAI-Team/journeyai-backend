@@ -271,7 +271,8 @@ class AssistantsManager:
         for tool in assistant.tool_config["tools"]:
             match tool["name"]:
                 case "openai_web_search":
-                    tools.append(WebSearchTool())
+                    # tools.append(WebSearchTool())
+                    pass
                 case _:
                     tools.append(get_tool(tool["name"], tool["type"]))
 
