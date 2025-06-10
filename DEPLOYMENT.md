@@ -102,16 +102,6 @@ make run-local
 
 This uses `docker-compose.local.yaml` which only runs the infrastructure services (MongoDB, Redis, Qdrant) while running the application processes directly on your machine.
 
-## Scaling Limitations
-
-⚠️ **Important**: This application currently **cannot be scaled horizontally** due to:
-
-1. WebSocket connections stored in memory
-2. Singleton patterns in client classes
-3. Global state management
-
-If you need to scale, you must scale vertically (bigger servers) rather than horizontally (more servers).
-
 ## Monitoring
 
 ### Health Checks
