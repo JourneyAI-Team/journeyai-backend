@@ -217,48 +217,60 @@ async def process_session(ctx, connection_id: str, session_id: str):
     ):
 
         agent = await assistants_manager.get_agent(assistant)
-
         if len(messages) == 1:
             agent.model_settings.tool_choice = "file_search"
             logger.info("Forcing tool choice to file search for first message.")
+
+        base_mcp_servers = await assistants_manager.get_base_mcp_servers()
+
+        # Start the MCP servers
+        for mcp_server in base_mcp_servers:
+            await mcp_server.connect()
+
+        agent.mcp_servers.extend(base_mcp_servers)
 
         logger.info(f"Agent: {agent}")
         logger.info(f"Fetched {len(messages)} messages in session: {session_id}")
         logger.info(f"Processing session: {session_id}")
 
-        # Convert the messages into a format OpenAI understands
-        input = convert_messages_to_openai_format(messages)
-        result = await generate_response(
-            agent,
-            input,
-            session.user_id,
-            session.organization_id,
-            session.account_id,
-            session_id,
-            assistant=assistant,
-            history=messages,
-        )
-
-        # Stream events to the websocket for real time support
-        await emit_stream_events(connection_id, result, session_id)
-
-        # Save the response to the database
-        new_items = [item.to_input_item() for item in result.new_items]
-        for new_item in new_items:
-            new_message = Message(
-                output=new_item,
-                sender=SenderType.ASSISTANT,
-                user_id=session.user_id,
-                organization_id=session.organization_id,
-                session_id=session_id,
-                account_id=session.account_id,
-                assistant_id=assistant.id,
-                embed_after_insert=True,
+        try:
+            # Convert the messages into a format OpenAI understands
+            input = convert_messages_to_openai_format(messages)
+            result = await generate_response(
+                agent,
+                input,
+                session.user_id,
+                session.organization_id,
+                session.account_id,
+                session_id,
+                assistant=assistant,
+                history=messages,
             )
-            await new_message.save()
 
-            await arq.enqueue_job(
-                "post_message_creation",
-                new_message.id,
-                _queue_name="messages",
-            )
+            # Stream events to the websocket for real time support
+            await emit_stream_events(connection_id, result, session_id)
+
+            # Save the response to the database
+            new_items = [item.to_input_item() for item in result.new_items]
+            for new_item in new_items:
+                new_message = Message(
+                    output=new_item,
+                    sender=SenderType.ASSISTANT,
+                    user_id=session.user_id,
+                    organization_id=session.organization_id,
+                    session_id=session_id,
+                    account_id=session.account_id,
+                    assistant_id=assistant.id,
+                    embed_after_insert=True,
+                )
+                await new_message.save()
+
+                await arq.enqueue_job(
+                    "post_message_creation",
+                    new_message.id,
+                    _queue_name="messages",
+                )
+        finally:
+            # Stop the MCP servers
+            for mcp_server in base_mcp_servers:
+                await mcp_server.cleanup()
