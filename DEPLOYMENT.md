@@ -6,7 +6,7 @@ This guide explains how to deploy JourneyAI in production using Docker Compose.
 
 ### 1. Prerequisites
 
-- Docker and Docker Compose installed
+- Docker and Docker Compose installed.
 - Access to external API services (OpenAI, Groq, etc.)
 
 ### 2. Environment Setup
