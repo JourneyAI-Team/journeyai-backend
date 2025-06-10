@@ -102,9 +102,8 @@ async def emit_stream_events(
         connection_id,
         "agent_response",
         {
-            "kind": "done",
+            "type": "done",
             "session_id": session_id,
-            "ts": dt.datetime.now(tz=dt.timezone.utc).isoformat(),
         },
     )
 
