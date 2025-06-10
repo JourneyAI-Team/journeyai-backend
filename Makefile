@@ -21,11 +21,19 @@ setup-local:
 
 
 run-local:
-
 	@printf "$(BLUE)Starting local development environment...$(NC)\n"
+
+	# Kill any processes connected to Redis
+	@pids=$$(sudo lsof -i :6379 | grep ESTABLISHED | awk '{print $$2}' | sort -u); \
+	if [ -n "$$pids" ]; then \
+		echo "Killing Redis-connected processes: $$pids"; \
+		sudo kill -9 $$pids; \
+	else \
+		echo "No Redis-connected processes to kill."; \
+	fi
 
 	docker compose down
 	docker compose up -d
 	honcho -e .env.local start
-	
+
 	@printf "$(GREEN)Local development environment started.$(NC)\n"
