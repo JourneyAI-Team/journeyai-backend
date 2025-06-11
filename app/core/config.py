@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # CORS
     BACKEND_CORS_ORIGINS: list[str] = []
 
+    # Proxy settings (for reverse proxy setup like NGINX)
+    TRUST_PROXY_HEADERS: bool = True
+    ALLOWED_HOSTS: list[str] = ["*"]
+
     # MongoDB
     MONGODB_URL: str | None = None
     MONGODB_DB_NAME: str = "journeyai"
