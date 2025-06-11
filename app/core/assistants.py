@@ -1,6 +1,6 @@
 import pprint
 
-from agents import Agent, FileSearchTool, RunContextWrapper
+from agents import Agent, FileSearchTool, RunContextWrapper, WebSearchTool
 from agents.mcp.server import MCPServerStdio
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
@@ -271,8 +271,7 @@ class AssistantsManager:
         for tool in assistant.tool_config["tools"]:
             match tool["name"]:
                 case "openai_web_search":
-                    # tools.append(WebSearchTool())
-                    pass
+                    tools.append(WebSearchTool())
                 case _:
                     tools.append(get_tool(tool["name"], tool["type"]))
 
@@ -287,7 +286,7 @@ class AssistantsManager:
         return tools
 
     async def get_base_mcp_servers(self):
-        return [MCPServerStdio(get_search1api_mcp_server_params())]
+        return []
 
 
 assistants_manager = AssistantsManager()
