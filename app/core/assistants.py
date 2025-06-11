@@ -1,6 +1,6 @@
 import pprint
 
-from agents import Agent, FileSearchTool, RunContextWrapper, WebSearchTool
+from agents import Agent, FileSearchTool, RunContextWrapper
 from agents.mcp.server import MCPServerStdio
 from loguru import logger
 from qdrant_client.models import FieldCondition, Filter, MatchValue
