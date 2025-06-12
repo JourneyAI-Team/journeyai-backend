@@ -40,9 +40,22 @@ COPY . .
 RUN poetry install --no-dev
 
 # Create non-root user for security
-RUN groupadd -r appuser && useradd -r -g appuser appuser \
+RUN groupadd -r appuser && useradd -r -g appuser appuser -m \
     && chown -R appuser:appuser /app
+
+# Switch to appuser and configure npm
 USER appuser
+
+# Set up npm cache and config directories with proper permissions
+RUN mkdir -p /home/appuser/.npm /home/appuser/.npm-global && \
+    npm config set cache /home/appuser/.npm --global && \
+    npm config set prefix /home/appuser/.npm-global --global
+
+# Pre-install the MCP package to avoid runtime permission issues
+RUN npm install -g search1api-mcp
+
+# Add npm global bin to PATH
+ENV PATH="/home/appuser/.npm-global/bin:$PATH"
 
 # Expose port 8000
 EXPOSE 8000
