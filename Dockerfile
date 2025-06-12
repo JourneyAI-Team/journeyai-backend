@@ -43,15 +43,18 @@ RUN poetry install --no-dev
 RUN groupadd -r appuser && useradd -r -g appuser appuser -m \
     && chown -R appuser:appuser /app
 
-# Switch to appuser and configure npm
+# Configure npm directories for the appuser (as root)
+RUN mkdir -p /home/appuser/.npm /home/appuser/.npm-global \
+    && chown -R appuser:appuser /home/appuser/.npm /home/appuser/.npm-global
+
+# Switch to appuser
 USER appuser
 
-# Set up npm cache and config directories with proper permissions
-RUN mkdir -p /home/appuser/.npm /home/appuser/.npm-global && \
-    npm config set cache /home/appuser/.npm --global && \
-    npm config set prefix /home/appuser/.npm-global --global
+# Set npm config for the user (using user-level config)
+RUN npm config set cache /home/appuser/.npm && \
+    npm config set prefix /home/appuser/.npm-global
 
-# Pre-install the MCP package to avoid runtime permission issues
+# Pre-install the MCP package as the user (so it goes to the right location)
 RUN npm install -g search1api-mcp
 
 # Add npm global bin to PATH
