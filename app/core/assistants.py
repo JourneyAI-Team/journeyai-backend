@@ -271,7 +271,8 @@ class AssistantsManager:
         for tool in assistant.tool_config["tools"]:
             match tool["name"]:
                 case "openai_web_search":
-                    tools.append(WebSearchTool())
+                    if settings.USE_OPENAI_WEB_SEARCH:
+                        tools.append(WebSearchTool())
                 case _:
                     tools.append(get_tool(tool["name"], tool["type"]))
 
@@ -286,7 +287,13 @@ class AssistantsManager:
         return tools
 
     async def get_base_mcp_servers(self):
-        return [MCPServerStdio(get_search1api_mcp_server_params())]
+
+        mcp_servers = []
+
+        if not settings.USE_OPENAI_WEB_SEARCH:
+            mcp_servers.append(MCPServerStdio(get_search1api_mcp_server_params()))
+
+        return mcp_servers
 
 
 assistants_manager = AssistantsManager()
