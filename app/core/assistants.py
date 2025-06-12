@@ -286,7 +286,7 @@ class AssistantsManager:
         return tools
 
     async def get_base_mcp_servers(self):
-        return []
+        return [MCPServerStdio(get_search1api_mcp_server_params())]
 
 
 assistants_manager = AssistantsManager()
