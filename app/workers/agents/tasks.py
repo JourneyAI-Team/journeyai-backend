@@ -62,7 +62,7 @@ async def emit_stream_events(
 
             case "tool_output":
 
-                payload.update(it.raw_item.model_dump())
+                payload.update(it.raw_item)
 
             case "handoff_requested":
                 payload.update(
