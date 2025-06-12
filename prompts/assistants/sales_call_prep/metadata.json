@@ -1,0 +1,23 @@
+{
+    "name": "Sales Call Prep",
+    "description": "Prepare for a sales call with a new prospect",
+    "tool_config": {
+        "tools": [
+            {
+                "name": "save_artifact",
+                "type": "internal"
+            },
+            {
+                "name": "search_artifacts",
+                "type": "internal"
+            },
+            {
+                "name": "openai_web_search",
+                "type": "external"
+            }
+      ]
+    },
+    "model": "gpt-4.1",
+    "version": "0.0.1",
+    "category": "Prep"
+}

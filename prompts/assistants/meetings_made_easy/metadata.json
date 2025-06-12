@@ -1,0 +1,23 @@
+{
+    "name": "Meetings Made Easy",
+    "description": "Streamlines B2B sales outreach with personalized strategies.",
+    "tool_config": {
+        "tools": [
+            {
+                "name": "save_artifact",
+                "type": "internal"
+            },
+            {
+                "name": "search_artifacts",
+                "type": "internal"
+            },
+            {
+                "name": "openai_web_search",
+                "type": "external"
+            }
+        ]
+    },
+    "model": "gpt-4.1",
+    "version": "0.0.1",
+    "category": "Prospecting"
+}
