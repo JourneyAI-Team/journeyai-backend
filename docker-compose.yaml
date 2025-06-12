@@ -97,6 +97,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
     env_file:
       - .env.prod
+    command: ["mongod", "--auth"]
     restart: unless-stopped
     networks:
       - app-network
