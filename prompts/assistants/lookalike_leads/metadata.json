@@ -1,0 +1,23 @@
+{
+    "name": "New Client Research Prep",
+    "description": "",
+    "tool_config": {
+        "tools": [
+            {
+                "name": "save_artifact",
+                "type": "internal"
+            },
+            {
+                "name": "search_artifacts",
+                "type": "internal"
+            },
+            {
+                "name": "openai_web_search",
+                "type": "external"
+            }
+      ]
+    },
+    "model": "gpt-4o",
+    "version": "0.0.1",
+    "category": "Prep"
+}
