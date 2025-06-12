@@ -50,6 +50,7 @@ class Settings(BaseSettings):
 
     # OpenAI
     OPENAI_API_KEY: str | None = None
+    USE_OPENAI_WEB_SEARCH: bool = True
 
     # Groq
     GROQ_API_KEY: str | None = None
