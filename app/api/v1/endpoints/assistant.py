@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 from loguru import logger
 
 from app.models.assistant import Assistant
@@ -42,6 +42,7 @@ async def create_assistant(assistant: AssistantCreate):
         name=assistant.name,
         internal_name=assistant.internal_name,
         description=assistant.description,
+        category=assistant.category,
         tool_config=assistant.tool_config,
         testing=assistant.testing,
         version=assistant.version,
@@ -68,14 +69,20 @@ async def create_assistant(assistant: AssistantCreate):
     "/",
     response_model=list[AssistantRead],
     status_code=status.HTTP_200_OK,
-    description="List all assistants.",
+    description="List all assistants. Optionally filter by category.",
 )
-async def list_assistants():
-    logger.info("List assistants request received.")
+async def list_assistants(
+    category: str | None = Query(None, description="Filter assistants by category")
+):
+    logger.info(f"List assistants request received. Category filter: {category}")
 
-    assistants = await Assistant.find_all().to_list()
+    if category:
+        assistants = await Assistant.find(Assistant.category == category).to_list()
+        logger.info(f"Found {len(assistants)} assistants in category '{category}'.")
+    else:
+        assistants = await Assistant.find_all().to_list()
+        logger.info(f"Found {len(assistants)} assistants total.")
 
-    logger.info(f"Found {len(assistants)} assistants.")
     return assistants
 
 

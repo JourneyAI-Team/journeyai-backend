@@ -14,6 +14,7 @@ class AssistantBase(BaseModel):
     name: str
     internal_name: str
     description: str
+    category: str = "General"
     tool_config: AssistantToolConfig = {
         "tools": [
             {
@@ -22,10 +23,6 @@ class AssistantBase(BaseModel):
             },
             {
                 "name": "search_artifacts",
-                "type": ToolType.INTERNAL,
-            },
-            {
-                "name": "search_assistant_documents",
                 "type": ToolType.INTERNAL,
             },
             {
@@ -54,6 +51,7 @@ class AssistantUpdate(BaseModel):
     name: str | None = None
     internal_name: str | None = None
     description: str | None = None
+    category: str | None = None
     tool_config: dict[str, str] | None = None
     testing: bool | None = None
     version: str | None = None

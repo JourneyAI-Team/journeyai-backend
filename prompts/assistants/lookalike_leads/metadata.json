@@ -1,0 +1,23 @@
+{
+    "name": "Find me Lookalike Leads",
+    "description": "Find me lookalike leads for a given company",
+    "tool_config": {
+        "tools": [
+            {
+                "name": "save_artifact",
+                "type": "internal"
+            },
+            {
+                "name": "search_artifacts",
+                "type": "internal"
+            },
+            {
+                "name": "openai_web_search",
+                "type": "external"
+            }
+      ]
+    },
+    "model": "gpt-4.1",
+    "version": "0.0.1",
+    "category": "Prospecting"
+}
