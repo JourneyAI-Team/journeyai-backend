@@ -1,6 +1,6 @@
 {
-    "name": "New Client Research Prep",
-    "description": "",
+    "name": "Find me Lookalike Leads",
+    "description": "Find me lookalike leads for a given company",
     "tool_config": {
         "tools": [
             {
@@ -17,7 +17,7 @@
             }
       ]
     },
-    "model": "gpt-4o",
+    "model": "gpt-4.1",
     "version": "0.0.1",
-    "category": "Prep"
+    "category": "Prospecting"
 }
