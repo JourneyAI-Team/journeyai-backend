@@ -24,6 +24,7 @@ class Assistant(Document):
     name: str
     internal_name: str
     description: str
+    category: str = "General"  # Default category
 
     tool_config: AssistantToolConfig = Field(default_factory=AssistantToolConfig)
     testing: bool = False

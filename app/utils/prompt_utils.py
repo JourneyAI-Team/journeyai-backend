@@ -92,7 +92,7 @@ async def insert_preloaded_assistant(
     Raises
     ------
     FileNotFoundError
-        If the master.md file or assistant directory does not exist.
+        If the master.md file, metadata.json file, or assistant directory does not exist.
     """
 
     internal_name = name
@@ -102,13 +102,11 @@ async def insert_preloaded_assistant(
 
         assistant_dir_path = os.path.join(os.getcwd(), "prompts", "assistants", name)
         master_file_path = os.path.join(assistant_dir_path, "master.md")
-        tool_config_path = os.path.join(assistant_dir_path, "tool_config.json")
-        description_file_path = os.path.join(assistant_dir_path, "description.md")
+        metadata_file_path = os.path.join(assistant_dir_path, "metadata.json")
 
         logger.debug(f"Assistant directory path: {assistant_dir_path}")
         logger.debug(f"Master file path: {master_file_path}")
-        logger.debug(f"Tool config file path: {tool_config_path}")
-        logger.debug(f"Description file path: {description_file_path}")
+        logger.debug(f"Metadata file path: {metadata_file_path}")
 
         # Check if the assistant is already in the database
         existing_assistant = await Assistant.find_one({"internal_name": internal_name})
@@ -130,45 +128,37 @@ async def insert_preloaded_assistant(
             logger.exception(f"Error reading master.md file: {str(e)}")
             raise
 
-        # Read tool_config.json for the tool configuration
+        # Read metadata.json for the assistant metadata
         try:
-            with open(tool_config_path, "r", encoding="utf-8") as file:
-                tool_config = json.load(file)
-            logger.debug("Successfully read tool_config.json file")
+            with open(metadata_file_path, "r", encoding="utf-8") as file:
+                metadata = json.load(file)
+            logger.debug("Successfully read metadata.json file")
         except FileNotFoundError:
-            logger.error(f"Tool config file not found: {tool_config_path}")
+            logger.error(f"Metadata file not found: {metadata_file_path}")
             raise
         except Exception as e:
-            logger.exception(f"Error reading tool_config.json file: {str(e)}")
+            logger.exception(f"Error reading metadata.json file: {str(e)}")
             raise
 
-        # Read description.md for the assistant description (optional)
-        description = f"Pre-loaded assistant: {name}"  # Default fallback
-        try:
-            with open(description_file_path, "r", encoding="utf-8") as file:
-                description = file.read().strip()
-            logger.debug(
-                f"Successfully read description.md file ({len(description)} characters)"
-            )
-        except FileNotFoundError:
-            logger.debug(
-                f"Description file not found: {description_file_path}, using default description"
-            )
-        except Exception as e:
-            logger.warning(
-                f"Error reading description.md file: {str(e)}, using default description"
-            )
+        # Extract values from metadata with defaults
+        assistant_name = metadata.get("name", name.replace("_", " ").title())
+        description = metadata.get("description", f"Pre-loaded assistant: {name}")
+        category = metadata.get("category", "General")
+        tool_config = metadata.get("tool_config", {"tools": []})
+        model = metadata.get("model", "gpt-4o")
+        version = metadata.get("version", "0.0.1")
 
-        # Create Assistant object with placeholders for other fields
+        # Create Assistant object
         assistant = Assistant(
-            name=name.replace("_", " ").title(),
+            name=assistant_name,
             internal_name=internal_name,
             description=description,
+            category=category,
             tool_config=tool_config,
             developer_prompt=developer_prompt,
-            model="gpt-4o",  # Default model
+            model=model,
             testing=True,  # Mark as testing since it's pre-loaded
-            version="0.0.1",
+            version=version,
         )
 
         # Save the assistant to get an ID
@@ -176,14 +166,11 @@ async def insert_preloaded_assistant(
         logger.info(f"Assistant '{name}' created with ID: {assistant.id}")
 
         with logger.contextualize(assistant_id=assistant.id):
-            # Get all .md files in the assistant directory except master.md and description.md
+            # Get all .md files in the assistant directory except master.md
             try:
                 md_files = []
                 for filename in os.listdir(assistant_dir_path):
-                    if filename.endswith(".md") and filename not in [
-                        "master.md",
-                        "description.md",
-                    ]:
+                    if filename.endswith(".md") and filename != "master.md":
                         md_files.append(filename)
 
                 logger.debug(

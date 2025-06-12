@@ -42,6 +42,7 @@ async def create_assistant(assistant: AssistantCreate):
         name=assistant.name,
         internal_name=assistant.internal_name,
         description=assistant.description,
+        category=assistant.category,
         tool_config=assistant.tool_config,
         testing=assistant.testing,
         version=assistant.version,
