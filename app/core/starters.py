@@ -47,6 +47,12 @@ async def initialize_app():
 
     logger.info("Inserting preloaded assistants...")
     await insert_preloaded_assistant("new_client_research_prep")
+    await insert_preloaded_assistant("new_client_account_plan")
+    await insert_preloaded_assistant("lookalike_leads")
+    await insert_preloaded_assistant("social_media_writer")
+    await insert_preloaded_assistant("sales_call_prep")
+    await insert_preloaded_assistant("annual_report_summarizer")
+    await insert_preloaded_assistant("meetings_made_easy")
     logger.success("Preloaded assistants inserted successfully")
 
 
