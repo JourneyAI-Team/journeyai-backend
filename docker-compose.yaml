@@ -93,6 +93,10 @@ services:
       - mongodb_data:/data/db
     environment:
       - MONGO_INITDB_DATABASE=journeyai
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
+    env_file:
+      - .env.prod
     restart: unless-stopped
     networks:
       - app-network
