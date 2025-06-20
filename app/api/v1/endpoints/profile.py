@@ -48,13 +48,9 @@ async def update_profile(
                 
                 # Remove possible duplicates from favorite assistants
                 new_favorite_assistants = update_data.get("favorite_assistants")
-                cur_favorite_assistants = profile_dict.get("favorite_assistants")
-                
-                if new_favorite_assistants and cur_favorite_assistants:
-                    update_data["favorite_assistants"] = list(set(new_favorite_assistants + cur_favorite_assistants))
-                elif new_favorite_assistants and not cur_favorite_assistants:
+                if new_favorite_assistants:
                     update_data["favorite_assistants"] = list(set(new_favorite_assistants))
-                
+
                 profile_dict.update(update_data)
                 
                 # Update the user's profile in the database
