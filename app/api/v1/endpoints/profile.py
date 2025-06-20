@@ -41,12 +41,17 @@ async def update_profile(
         try:
             # Get only the fields that were set (exclude unset fields for partial updates)
             update_data = profile_update.model_dump(exclude_unset=True)
-
+            
             if update_data:
+                # Remove possible duplicates from favorite assistants
+                favorite_assistants = update_data.get("favorite_assistants")
+                if favorite_assistants:
+                    update_data["favorite_assistants"] = list(set(favorite_assistants))
+                
                 # Update the profile fields
                 profile_dict = current_user.profile.model_dump()
                 profile_dict.update(update_data)
-
+                
                 # Update the user's profile in the database
                 await current_user.set({User.profile: profile_dict})
 
