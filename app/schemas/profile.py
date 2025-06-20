@@ -22,7 +22,7 @@ class ProfileBase(BaseModel):
     goals: Optional[list[str]] = None
     preferences: Optional[dict] = None
     assistant_notes: Optional[dict] = None
-
+    favorite_assistants: Optional[list[str]] = None
 
 class ProfileCreate(ProfileBase):
     pass
@@ -42,7 +42,7 @@ class ProfileUpdate(BaseModel):
     communication_style: Optional[str] = None
     goals: Optional[list[str]] = None
     preferences: Optional[dict] = None
-
+    favorite_assistants: Optional[list[str]] = None
 
 class ProfileRead(ProfileBase):
     pass
