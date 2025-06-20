@@ -3,7 +3,7 @@ import datetime as dt
 from pydantic import BaseModel
 
 from app.models.assistant import AssistantToolConfig
-from app.schemas.types import ToolType
+from app.schemas.types import AssistantCategoryType, ToolType
 
 
 class AssistantBase(BaseModel):
@@ -66,3 +66,10 @@ class AssistantRead(AssistantBase):
 
     id: str
     created_at: dt.datetime
+
+class AssistantCategoryRead(BaseModel):
+    """
+    Schema for reading an assistant category.
+    """
+
+    assistant_categories: list[AssistantCategoryType]

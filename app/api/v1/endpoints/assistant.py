@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Query, status
 from loguru import logger
 
 from app.models.assistant import Assistant
-from app.schemas.assistant import AssistantCreate, AssistantRead, AssistantUpdate
+from app.schemas.assistant import AssistantCreate, AssistantRead, AssistantUpdate, AssistantCategoryRead
+from app.schemas.types import AssistantCategoryType
 
 router = APIRouter()
 
@@ -84,6 +85,18 @@ async def list_assistants(
         logger.info(f"Found {len(assistants)} assistants total.")
 
     return assistants
+
+
+@router.get(
+    "/categories",
+    response_model=AssistantCategoryRead,
+    status_code=status.HTTP_200_OK,
+    description="List all assistant categories.",
+)
+async def list_assistant_categories():
+    logger.info("List assistant categories request received.")
+
+    return AssistantCategoryRead(assistant_categories=list(AssistantCategoryType))
 
 
 @router.get(

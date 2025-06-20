@@ -23,3 +23,9 @@ class ToolType(str, Enum):
 
 class EmbeddingInputSourceType(str, Enum):
     USER = "user"
+
+class AssistantCategoryType(str, Enum):
+    ACCOUNT_STRATEGY = "account strategy"
+    PROSPECTING = "prospecting"
+    RESEARCH = "research"
+    CLOSING_SALES = "closing sales"
