@@ -136,7 +136,7 @@ async def process_session(ctx, connection_id: str, session_id: str):
         message_id=messages[-1].id,
     ):
 
-        agent = await assistants_manager.get_agent(assistant)
+        agent = await assistants_manager.get_agent(assistant, session)
         if len(messages) == 1:
             agent.model_settings.tool_choice = "file_search"
             logger.info("Forcing tool choice to file search for first message.")
