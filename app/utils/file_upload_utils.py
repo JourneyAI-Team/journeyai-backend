@@ -37,6 +37,7 @@ async def batch_insert_uploaded_session_files(
     with logger.contextualize(vector_store_id=vector_store_id, files=files):
 
         uploaded_files = 0
+        uploaded_file_ids = []
         for file in files:
 
             try:
@@ -50,15 +51,23 @@ async def batch_insert_uploaded_session_files(
                     f"Uploaded file '{file.filename}' with ID: {uploaded_file.id}"
                 )
 
-                # Add file to vector store
-                await openai.vector_stores.files.create(
-                    vector_store_id=vector_store_id, file_id=uploaded_file.id
-                )
-
+                uploaded_file_ids.append(uploaded_file.id)
                 uploaded_files += 1
-                logger.debug(f"Added file '{file.filename}' to vector store")
-
             except Exception as e:
                 logger.exception(f"Error processing file '{file.filename}': {str(e)}")
                 # Continue with other files even if one fails
                 continue
+        try:
+            # Bulk add files to vector store
+            await openai.vector_stores.file_batches.create_and_poll(
+                vector_store_id=vector_store_id,
+                file_ids=uploaded_file_ids,
+            )
+
+            logger.debug(f"Added {len(uploaded_file_ids)} files to vector store")
+        except Exception as e:
+            logger.exception(f"Error adding files to vector store.")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=e,
+            ) from e
