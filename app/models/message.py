@@ -4,7 +4,7 @@ import uuid
 from beanie import Document
 from pydantic import Field
 
-from app.schemas.message import InputMessageSchema
+from app.schemas.message import AttachmentMetadata, InputMessageSchema
 from app.schemas.types import SenderType
 
 
@@ -14,6 +14,7 @@ class Message(Document):
     output: dict | None = None
     input: InputMessageSchema | None = None
     sender: SenderType
+    attachments: list[AttachmentMetadata] = Field(default_factory=list)
 
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)

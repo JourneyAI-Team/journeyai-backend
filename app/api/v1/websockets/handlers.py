@@ -29,9 +29,13 @@ async def ingest_message(connection_id: str, user: User, data: IngestMessageSche
     ):
         logger.debug(f"Ingesting message: {data}")
 
+        # Extract attachments if present
+        attachments = data.get("attachments", [])
+
         new_message = Message(
             input={"content": data["content"]},
             sender=SenderType.USER,
+            attachments=attachments,
             user_id=user.id,
             organization_id=user.organization_id,
             session_id=session.id,
