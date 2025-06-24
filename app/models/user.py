@@ -42,6 +42,8 @@ class Profile(BaseModel):
         Key-value pairs for various user preferences
     assistant_notes : dict, optional
         Notes that assistants can add about the user (assistant_id -> notes)
+    favorite_assistants : list[str], optional
+        List of assistant ids that the user has favorited
     """
 
     first_name: Optional[str] = None
@@ -58,7 +60,7 @@ class Profile(BaseModel):
     goals: Optional[list[str]] = None
     preferences: Optional[dict] = None
     assistant_notes: Optional[dict] = None
-
+    favorite_assistants: Optional[list[str]] = None
 
 class User(Document):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)

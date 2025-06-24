@@ -8,6 +8,7 @@ from qdrant_client.models import FieldCondition, Filter, MatchValue
 from app.core.config import settings
 from app.external.ai_service import create_summary_for_search, get_embeddings
 from app.models.assistant import Assistant
+from app.models.session import Session
 from app.models.user import User
 from app.schemas.agent_context import AgentContext, InstructionsContext
 from app.schemas.types import SenderType
@@ -23,7 +24,9 @@ class AssistantsManager:
     def __init__(self):
         pass
 
-    async def get_agent(self, assistant: Assistant) -> Agent[AgentContext]:
+    async def get_agent(
+        self, assistant: Assistant, session: Session
+    ) -> Agent[AgentContext]:
         """
         Get an agent for an assistant.
 
@@ -39,7 +42,7 @@ class AssistantsManager:
         """
 
         # Create new agent if not in cache
-        tools = self.get_tools(assistant)
+        tools = self.get_tools(assistant, session)
         agent = Agent[AgentContext](
             name=assistant.name,
             model=assistant.model,
@@ -251,7 +254,7 @@ class AssistantsManager:
         )
         return self._parse_related_messages(related_messages)
 
-    def get_tools(self, assistant: Assistant) -> list:
+    def get_tools(self, assistant: Assistant, session: Session) -> list:
         """
         Get the tools for an assistant.
 
@@ -278,6 +281,9 @@ class AssistantsManager:
 
         if assistant.tool_config.get("vector_store_ids"):
             vector_store_ids = [i for i in assistant.tool_config["vector_store_ids"]]
+            if session.vector_store_id:
+                vector_store_ids.append(session.vector_store_id)
+
             tools.append(
                 FileSearchTool(
                     vector_store_ids=vector_store_ids, include_search_results=True

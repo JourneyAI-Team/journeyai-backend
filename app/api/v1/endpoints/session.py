@@ -1,14 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, HTTPException, File, status
 from loguru import logger
 
 from app.api.deps import get_current_user
+from app.utils.file_upload_utils import (
+    insert_uploaded_session_file,
+    batch_insert_uploaded_session_files,
+)
+
 from app.models.account import Account
 from app.models.assistant import Assistant
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.session import SessionCreate, SessionRead, SessionUpdate
+from app.clients.openai_client import get_openai_async_client
 
 router = APIRouter()
+
+openai = get_openai_async_client()
 
 
 @router.post(
@@ -62,8 +70,29 @@ async def create_session(
         )
 
         try:
+            # Create a new vector store for the session
+            vector_store = await openai.vector_stores.create(
+                name=f"session:{new_session.id}"
+            )
+
+            logger.debug(f"Created vector store with ID: {vector_store.id}")
+
+        except Exception as e:
+            logger.exception(
+                f"Vector store creation failed when creating session. {new_session.title=}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error creating vector store.",
+            ) from e
+
+        try:
+            # Add the vector store id to the session
+            new_session.vector_store_id = vector_store.id
+
             # Save the new session to the database
             await new_session.insert()
+
             logger.success(f"Session created successfully. {new_session.title=}")
         except Exception as e:
             logger.exception(
@@ -73,6 +102,7 @@ async def create_session(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error creating session.",
             ) from e
+
         return new_session
 
 
@@ -243,4 +273,116 @@ async def delete_session(
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error deleting session.",
+            ) from e
+
+
+@router.post(
+    "/{session_id}/file",
+    # response_model=FileRead,
+    description="Upload a file to a session.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Session could not be found."},
+    },
+)
+async def upload_file(
+    session_id: str,
+    file: UploadFile,
+    current_user: User = Depends(get_current_user),
+):
+    with logger.contextualize(
+        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+        session_id=session_id,
+    ):
+        logger.info(
+            f"Upload file request received: filename: {file.filename}, content_type: {file.content_type}, size: {file.size}"
+        )
+
+        # Check if session exists.
+        session = await Session.find_one(
+            Session.id == session_id,
+            Session.organization_id == current_user.organization_id,
+        )
+        if not session:
+            logger.warning("Session could not be found.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Session could not be found.",
+            )
+        try:
+            if not session.vector_store_id:
+                logger.warning("Session does not have a vector store id.")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Session does not have a vector store id.",
+                )
+
+            # Upload the file to the openai file storage
+            await insert_uploaded_session_file(
+                file,
+                session.vector_store_id,
+            )
+            logger.success(f"File uploaded successfully. {file.filename=}")
+            return {
+                "filename": file.filename,
+                "content_type": file.content_type,
+                "size": len(await file.read()),
+            }
+        except Exception as e:
+            logger.exception(
+                f"Database insert failed when uploading file to session. {session_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error uploading file to session.",
+            ) from e
+
+
+@router.post(
+    "/{session_id}/files",
+    description="Upload multiple files to a session.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"description": "Session could not be found."},
+    },
+)
+async def upload_files(
+    session_id: str,
+    files: list[UploadFile] = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    with logger.contextualize(
+        user_id=current_user.id,
+        organization_id=current_user.organization_id,
+        session_id=session_id,
+    ):
+        logger.info(f"Upload files request received: {len(files)} files")
+
+        # Check if session exists.
+        session = await Session.find_one(
+            Session.id == session_id,
+            Session.organization_id == current_user.organization_id,
+        )
+        if not session:
+            logger.warning("Session could not be found.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Session could not be found.",
+            )
+        try:
+            if not session.vector_store_id:
+                logger.warning("Session does not have a vector store id.")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Session does not have a vector store id.",
+                )
+
+            await batch_insert_uploaded_session_files(files, session.vector_store_id)
+            logger.success(f"Files uploaded successfully. {len(files)} files")
+        except Exception as e:
+            logger.exception(
+                f"Database insert failed when uploading files to session. {session_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error uploading files to session.",
             ) from e

@@ -10,6 +10,7 @@ class Session(Document):
 
     title: str = "New Session"
     summary: str | None = None
+    vector_store_id: str | None = None
 
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
