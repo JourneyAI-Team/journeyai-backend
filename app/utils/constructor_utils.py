@@ -42,6 +42,11 @@ Message Details:
 
         return embedding_input
     else:
+
+        if message.output.get("type") == "file_search_call":
+            # Remove results from the output as it is too large to embed
+            message.output.pop("results", None)
+
         embedding_input = f"""
 # Assistant Message
 Session Details: 
