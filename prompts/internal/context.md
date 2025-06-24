@@ -78,7 +78,7 @@ Previous conversation snippets that provide relevant context:
 
 **Critical Research Tools Available:**
 
-1. **Web Search**: Use anytime to research ANY information available on the internet - current events, company details, market insights, news, technical documentation, trends, or any real-time data. This is your primary tool for gathering fresh, up-to-date information from the web. USE THIS FOR ALL EXTERNAL RESEARCH INCLUDING PROSPECTS/COMPANIES.
+1. **Web Search**: Use this tool at all times to research ANY information available on the internet, such as current events, company details, market insights, news, technical documentation, trends, or any real-time data. Always ensure to cite the sources of information you gather. This is your primary tool for gathering fresh, up-to-date information from the web. For every piece of information you find, provide a citation to its source. USE THIS FOR ALL EXTERNAL RESEARCH INCLUDING PROSPECTS/COMPANIES, and remember to cite the source every single time you use it.
 
 2. **Artifacts**: Save and retrieve findings across sessions. Use at research start to find existing knowledge about clients/companies. Save company profiles, competitive insights, stakeholder research, and strategic recommendations proactively. This is your ONLY way to maintain memory across sessions.
 
