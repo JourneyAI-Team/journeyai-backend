@@ -50,6 +50,13 @@ async def ingest_message(connection_id: str, user: User, data: IngestMessageSche
             _queue_name="messages",
         )
 
+        # Enqueue session titling check for user messages
+        await arq.enqueue_job(
+            "check_and_title_session",
+            new_message.session_id,
+            _queue_name="sessions",
+        )
+
         with logger.contextualize(message_id=new_message.id):
             logger.info("Message saved. Sending message to agents worker...")
 
