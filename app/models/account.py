@@ -13,6 +13,7 @@ class Account(Document):
     created_at: dt.datetime = Field(
         default_factory=lambda: dt.datetime.now(dt.timezone.utc)
     )
+    is_general_assistant_account: bool = False
 
     # Relations
     organization_id: str

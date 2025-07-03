@@ -1,0 +1,15 @@
+{
+    "name": "General Assistant",
+    "description": "The general assistant for the user.",
+    "tool_config": {
+        "tools": [
+            {
+                "name": "openai_web_search",
+                "type": "external"
+            }
+      ]
+    },
+    "model": "gpt-4.1",
+    "version": "0.0.1",
+    "category": "General"
+}

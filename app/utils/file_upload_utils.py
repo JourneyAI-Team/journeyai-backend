@@ -1,5 +1,5 @@
-from loguru import logger
 from fastapi import HTTPException, UploadFile, status
+from loguru import logger
 
 from app.clients.openai_client import get_openai_async_client
 

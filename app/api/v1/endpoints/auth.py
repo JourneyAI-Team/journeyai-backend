@@ -9,7 +9,10 @@ from loguru import logger
 from app.api.deps import get_current_user
 from app.core.config import settings
 from app.core.security import create_access_token, get_password_hash, verify_password
+from app.models.assistant import Assistant
 from app.models.organization import Organization
+from app.models.account import Account
+from app.models.session import Session
 from app.models.user import User
 from app.schemas.token import Token
 from app.schemas.user import UserApiKey, UserCreate, UserRead
@@ -105,6 +108,30 @@ async def register(user_in: UserCreate) -> Any:
     # Generate api key for websockets auth and save to user database
     api_key = uuid.uuid4().hex
     new_user.access_token = api_key
+
+    # Create a general assistant account for the user
+    general_assistant_account = Account(
+        name="General Assistant",
+        description="The general assistant account for the user.",
+        is_general_assistant_account=True,
+        organization_id=organization.id,
+        user_id=new_user.id,
+    )
+    await general_assistant_account.insert()
+
+    # Get the id of the general assistant
+    general_assistant = await Assistant.find_one(Assistant.name == "General Assistant")
+
+    # Create a general assistant session for the user
+    general_assistant_session = Session(
+        title="General Assistant",
+        summary="The general assistant session for the user.",
+        organization_id=organization.id,
+        user_id=new_user.id,
+        assistant_id=general_assistant.id,
+        account_id=general_assistant_account.id,
+    )
+    await general_assistant_session.insert()
 
     try:
         # Save user to database

@@ -371,12 +371,19 @@ async def upload_files(
         try:
             if not session.vector_store_id:
                 logger.warning("Session does not have a vector store id.")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Session does not have a vector store id.",
+                logger.info("Creating vector store for session...")
+                vector_store = await openai.vector_stores.create(
+                    name=f"session:{session.id}"
                 )
+                session.vector_store_id = vector_store.id
+                await session.save()
+                if not session.vector_store_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Session does not have a vector store id.",
+                    )
 
-            await batch_insert_uploaded_session_files(files, session.vector_store_id)
+            # await batch_insert_uploaded_session_files(files, session.vector_store_id)
             logger.success(f"Files uploaded successfully. {len(files)} files")
         except Exception as e:
             logger.exception(

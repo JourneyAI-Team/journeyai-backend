@@ -53,6 +53,7 @@ async def initialize_app():
     await insert_preloaded_assistant("sales_call_prep")
     await insert_preloaded_assistant("annual_report_summarizer")
     await insert_preloaded_assistant("meetings_made_easy")
+    await insert_preloaded_assistant("general_assistant")
     logger.success("Preloaded assistants inserted successfully")
 
 

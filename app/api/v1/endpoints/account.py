@@ -78,6 +78,7 @@ async def create_account(
     description="List accounts in an organization.",
 )
 async def list_accounts(
+    is_general_assistant_account: bool | None = None,
     current_user: User = Depends(get_current_user),
 ):
 
@@ -86,9 +87,27 @@ async def list_accounts(
     ):
         logger.info("List accounts request received.")
 
-        accounts = await Account.find(
-            Account.organization_id == current_user.organization_id
-        ).to_list()
+        # Filter by is_general_assistant_account
+        if is_general_assistant_account is not None:
+            # If true, filter by is_general_assistant_account, user_id, and organization_id
+            if is_general_assistant_account:
+                accounts = await Account.find(
+                    Account.organization_id == current_user.organization_id,
+                    Account.user_id == current_user.id,
+                    Account.is_general_assistant_account == True,
+                ).to_list()
+            # If false, retrieve all accounts within an organization except the general assistant accounts
+            else:
+                accounts = await Account.find(
+                    Account.organization_id == current_user.organization_id,
+                    Account.user_id == current_user.id,
+                    Account.is_general_assistant_account == False,
+                ).to_list()
+        # Retrieve all accounts from the user's organization including all users' general assistant accounts
+        else:
+            accounts = await Account.find(
+                Account.organization_id == current_user.organization_id,
+            ).to_list()
 
         logger.info(f"Found {len(accounts)} accounts in the organization.")
 
