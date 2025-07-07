@@ -17,6 +17,7 @@ RUN apt-get update \
         build-essential \
         nodejs \
         npm \
+        parallel \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
