@@ -178,9 +178,15 @@ class AssistantsManager:
             }
 
             if data["sender"] == SenderType.USER.value:
-                data["content"] = message.payload["input"]["content"]
+                data["content"] = (
+                    message.payload["input"]["content"][:150] + "..."
+                    if len(message.payload["input"]["content"]) > 150
+                    else message.payload["input"]["content"]
+                )
             else:
                 data["content"] = message.payload["output"]
+                data["content"].pop("id", None)
+                data["content"].pop("annotations", None)
 
                 # Remove file search results to not waste tokens
                 if data["content"].get("type") == "file_search_call":
