@@ -15,6 +15,7 @@ from app.models.organization import Organization
 from app.models.session import Session
 from app.models.user import User
 from app.schemas.agent_context import AgentContext
+from app.schemas.types import SenderType
 
 
 async def create_summary_for_search(messages: list[Message]) -> str:
@@ -31,6 +32,31 @@ async def create_summary_for_search(messages: list[Message]) -> str:
     summary : str
         The summary of the list of messages.
     """
+
+    # Pre-processes the messages so that they are not too big
+    messages = [x.model_dump() for x in messages]
+    raw_messages = []
+    for message in messages:
+
+        data = {"sender": message.sender.value}
+
+        if data["sender"] == SenderType.USER.value:
+            data["content"] = (
+                message.input["content"][:150] + "..."
+                if len(message.input["content"]) > 150
+                else message.input["content"]
+            )
+        else:
+            if message.output:
+                data["content"] = message.output
+                data["content"].pop("id", None)
+                data["content"].pop("annotations", None)
+
+                # Remove file search results to not waste tokens
+                if data["content"].get("type") == "file_search_call":
+                    data["content"].pop("results", None)
+
+        raw_messages.append(data)
 
     messages_input = pprint.pformat(messages)
     llm_input = [
