@@ -55,7 +55,7 @@ The following saved research findings are relevant to this conversation:
 Previous conversation snippets that provide relevant context:
 
 {% for message in instructions_context.related_messages %}
-**{{ message['sender']|title }}** *(Message ID: {{ message['id'] }})*:
+**{{ message['sender']|title }}**
 {{ message['content'] }}
 
 {% if not loop.last %}---{% endif %}
