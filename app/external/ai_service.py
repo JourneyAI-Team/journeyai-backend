@@ -34,7 +34,6 @@ async def create_summary_for_search(messages: list[Message]) -> str:
     """
 
     # Pre-processes the messages so that they are not too big
-    messages = [x.model_dump() for x in messages]
     raw_messages = []
     for message in messages:
 
