@@ -14,6 +14,10 @@
             {
                 "name": "openai_web_search",
                 "type": "external"
+            },
+            {
+                "name": "web_search",
+                "type": "external"
             }
       ]
     },

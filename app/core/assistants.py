@@ -12,9 +12,6 @@ from app.models.session import Session
 from app.models.user import User
 from app.schemas.agent_context import AgentContext, InstructionsContext
 from app.schemas.types import SenderType
-from app.tools.mcp_servers.search1api import (
-    get_mcp_server_params as get_search1api_mcp_server_params,
-)
 from app.utils.prompt_utils import render_prompt_template
 from app.utils.qdrant_utils import search_vectors
 from app.utils.tool_utils import get_tool
@@ -301,9 +298,6 @@ class AssistantsManager:
     async def get_base_mcp_servers(self):
 
         mcp_servers = []
-
-        if not settings.USE_OPENAI_WEB_SEARCH:
-            mcp_servers.append(MCPServerStdio(get_search1api_mcp_server_params()))
 
         return mcp_servers
 
