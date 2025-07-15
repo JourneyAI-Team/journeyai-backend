@@ -1,9 +1,14 @@
+from beanie.operators import In
 from fastapi import APIRouter, HTTPException, Query, status
 from loguru import logger
-from beanie.operators import In
 
 from app.models.assistant import Assistant
-from app.schemas.assistant import AssistantCreate, AssistantRead, AssistantUpdate, AssistantCategoryRead
+from app.schemas.assistant import (
+    AssistantCategoryRead,
+    AssistantCreate,
+    AssistantRead,
+    AssistantUpdate,
+)
 from app.schemas.types import AssistantCategoryType
 
 router = APIRouter()
@@ -77,8 +82,10 @@ async def list_assistants(
     category: str | None = Query(None, description="Filter assistants by category"),
     ids: list[str] | None = Query(None, description="Filter assistants by ids"),
 ):
-    logger.info(f"List assistants request received. Category filter: {category}; ids filter: {ids}")
-    
+    logger.info(
+        f"List assistants request received. Category filter: {category}; ids filter: {ids}"
+    )
+
     if ids:
         assistants = await Assistant.find(In(Assistant.id, ids)).to_list()
         logger.info(f"Found {len(assistants)} assistants in ids '{ids}'.")
