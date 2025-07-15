@@ -90,7 +90,9 @@ async def list_assistants(
         assistants = await Assistant.find(In(Assistant.id, ids)).to_list()
         logger.info(f"Found {len(assistants)} assistants in ids '{ids}'.")
     elif category:
-        assistants = await Assistant.find(Assistant.category == category).to_list()
+        assistants = await Assistant.find(
+            Assistant.category == category.lower()
+        ).to_list()
         logger.info(f"Found {len(assistants)} assistants in category '{category}'.")
     else:
         assistants = await Assistant.find_all().to_list()
