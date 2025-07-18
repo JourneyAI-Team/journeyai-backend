@@ -42,6 +42,19 @@ run-local:
 		exit 1; \
 	fi
 
+	@if ! grep -q "^GROQ_API_KEY=gsk_" .env.local; then \
+		printf "$(RED)Error: GROQ_API_KEY not found or invalid in .env.local!$(NC)\n"; \
+		printf "$(RED)Please set GROQ_API_KEY to a valid Groq API key that starts with 'gsk_'$(NC)\n"; \
+		printf "$(RED)Get your API key from: https://console.groq.com/keys$(NC)\n"; \
+		exit 1; \
+	fi
+
+	@if ! grep -q "^SEARCH1API_KEY=" .env.local || grep -q "^SEARCH1API_KEY=$$" .env.local; then \
+		printf "$(RED)Error: SEARCH1API_KEY not found or empty in .env.local!$(NC)\n"; \
+		printf "$(RED)Please set SEARCH1API_KEY to a valid Search1API key$(NC)\n"; \
+		exit 1; \
+	fi
+
 	# Kill any processes connected to Redis (only if running as root)
 	@if [ "$$(id -u)" -eq 0 ]; then \
 		pids=$$(sudo lsof -i :6379 | grep ESTABLISHED | awk '{print $$2}' | sort -u); \
