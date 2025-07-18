@@ -13,6 +13,9 @@ Welcome to the Journey AI Repository! This README.md file will go over how to se
 
 ## Installation
 
+For Windows, see [Local Setup Windows](./docs/LOCAL_SETUP_WINDOWS.md)
+For MacOS, see [Local Setup MacOS](./docs/LOCAL_SETUP_MACOS.md)
+
 Run the following command to install the dependencies and create a `.env.local` file.
 ```bash
 make setup-local

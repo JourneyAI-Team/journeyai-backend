@@ -13,8 +13,14 @@ setup-local:
 		cp .env.example .env.local; \
 	fi
 
-	poetry install
-	poetry shell
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		printf "$(GREEN)macOS detected, using --no-root flag for poetry install...$(NC)\n"; \
+		poetry config virtualenvs.in-project true; \
+		poetry install --no-root; \
+	else \
+		poetry install; \
+		poetry shell; \
+	fi
 
 	@printf "$(GREEN)Local setup complete.$(NC)\n"
 	@printf "$(RED)Please add your external API keys to the .env.local file.$(NC)\n"
@@ -23,18 +29,35 @@ setup-local:
 run-local:
 	@printf "$(BLUE)Starting local development environment...$(NC)\n"
 
-	# Kill any processes connected to Redis
-	@pids=$$(sudo lsof -i :6379 | grep ESTABLISHED | awk '{print $$2}' | sort -u); \
-	if [ -n "$$pids" ]; then \
-		echo "Killing Redis-connected processes: $$pids"; \
-		sudo kill -9 $$pids; \
+	@if [ ! -f .env.local ]; then \
+		printf "$(RED)Error: .env.local file not found!$(NC)\n"; \
+		printf "$(RED)Please run 'make setup-local' first to create the .env.local file.$(NC)\n"; \
+		exit 1; \
+	fi
+
+	@if ! grep -q "^OPENAI_API_KEY=sk-" .env.local; then \
+		printf "$(RED)Error: OPENAI_API_KEY not found or invalid in .env.local!$(NC)\n"; \
+		printf "$(RED)Please set OPENAI_API_KEY to a valid OpenAI API key that starts with 'sk-'$(NC)\n"; \
+		printf "$(RED)Get your API key from: https://platform.openai.com/api-keys$(NC)\n"; \
+		exit 1; \
+	fi
+
+	# Kill any processes connected to Redis (only if running as root)
+	@if [ "$$(id -u)" -eq 0 ]; then \
+		pids=$$(sudo lsof -i :6379 | grep ESTABLISHED | awk '{print $$2}' | sort -u); \
+		if [ -n "$$pids" ]; then \
+			echo "Killing Redis-connected processes: $$pids"; \
+			sudo kill -9 $$pids; \
+		else \
+			echo "No Redis-connected processes to kill."; \
+		fi; \
 	else \
-		echo "No Redis-connected processes to kill."; \
+		echo "Skipping Redis process cleanup (not running as root)."; \
 	fi
 
 	docker compose -f docker-compose.local.yaml down
 	docker compose -f docker-compose.local.yaml up -d
-	honcho -e .env.local start
+	poetry run honcho -e .env.local start
 
 	@printf "$(GREEN)Local development environment started.$(NC)\n"
 
@@ -70,3 +93,10 @@ stop-production:
 	@printf "$(BLUE)Stopping production environment...$(NC)\n"
 	docker compose down
 	@printf "$(GREEN)Production environment stopped.$(NC)\n"
+
+kill-redis:
+	@pids=$$(sudo lsof -i :6379 | grep ESTABLISHED | awk '{print $$2}' | sort -u); \
+	if [ -n "$$pids" ]; then \
+		echo "Killing Redis-connected processes: $$pids"; \
+		sudo kill -9 $$pids; \
+	fi;
